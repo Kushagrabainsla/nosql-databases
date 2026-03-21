@@ -1,0 +1,110 @@
+1. In an ACID transactional database, consistency is usually defined as the correctness of the database's state after a transaction has executed. The application is guaranteed all integrity constraints will remain satisfied during state changes of the database as it transitions from one valid state to another. This is normally thought of as a guarantee for a single node/tightly coupled system and assumes the required coordination is successful and reliable.
+
+On the other hand, CAP consistency defines linearizable consistency in a distributed database system as all nodes will see the same data at exactly the same time after an update operation is performed against the database. CAP consistency is focused on achieving replica agreement between nodes with respect to the database state after node failures and network partitioning, whereas ACID consistency is focused on enforcing constraints/invariant conditions to keep data consistent.
+
+The fundamental difference between ACID consistency and CAP consistency is that ACID consistency verifies the correctness of individual pieces of data, while CAP consistency synchronizes replicated copies of data within distributed databases.
+
+
+
+
+2. The higher the isolation level (e.g., Serializable), the more block/lock/versioning will be needed to ensure that no two concurrent transactions interfere with one another. Unfortunately, this results in more contention, blocking, and coordination, resulting in higher latencies.
+
+The lower the isolation level (e.g., Read Committed or Read Uncommitted), the more concurrent access is allowed by relaxing some of the guarantees. This results in reduced waiting time and higher throughput and lower latency.
+
+Therefore, we have the trade off between "correctness" versus "Performance/Latency," where the higher the isolation, the more secure the transaction will be, and the slower it will be to execute.
+
+
+
+3. The right sequence of actions when doing Update X with Y is follows: 
+
+Write the log entry for the update in memory. 
+Update the data in memory. 
+Persist the log entry to disk. 
+Persist the updated data to disk. 
+
+This order adheres to the WAL rule regarding durability and crash recovery.
+
+
+
+4. The JDBC specification is not designed for use with an object-oriented paradigm; it is built on the relational database model. Accordingly, the JDBC API represents data as tables, rows and columns, and does not represent the data in the object-oriented paradigm, which means it has no notion of behaviour or identity for objects. In general, the JDBC API does not support: inheritance; polymorphism; object relationships; nor does it provide any mechanism to create object-oriented representations of records in a relational database.
+
+For this reason, developers are required to create mappings between their relational data and their object-oriented representations using an Object-Relational Mapping (ORM) framework, such as Hibernate, which are built on top of the JDBC API.
+
+
+
+5. Partitioning: Hash Partitioning uses a hash function to partition data, while range partitioning divides data according to value ranges. 
+
+Data will be distributed evenly with hash partitioning but not so much with range partitioning. Range partitioning is ideal for range queries or sequential scans because it allows for ease of access to ordered data. 
+
+However, you can have data skew and/or hot partitions using hash partitioning and you can use both partition methods in load balanced systems. 
+
+Range partitioning can be beneficial for time series or sequential data.
+
+
+
+6. Schema-on-write
+
+ - Schema is enforced before data is written
+
+ - Ensures consistency and validation upfront
+
+ - Example: PostgreSQL, MySQL
+
+Schema-on-read
+
+ - Data is stored without a predefined schema
+
+ - Schema is applied when data is read
+
+ - Offers flexibility for evolving data
+
+ - Example: Apache Hadoop, MongoDB
+
+
+
+7. A key-value database stores values as abstract data types and provides no way to query them except with their unique key.
+
+Key-value databases also do not support indexed querying or secondary indexing.
+
+On the other hand, document-based databases store semi-structured documents (e.g., in JSON format) in which the fields within a document can be queried and indexed.
+
+A document database has knowledge of the internal structure of the document; therefore, it allows for more complex querying and secondary indexes than a key-value database typically would.
+
+
+
+8. SELECT d.year, SUM(f.sales_amount) FROM sales_fact f JOIN date_dim d ON f.date_id = d.date_id GROUP BY d.year;
+
+Column-oriented databases store columns separately rather than all at once as with a traditional database (i.e. sales_amount and year). Therefore these types of databases can read from only the required columns rather than having to read an entire row. This allows for reduced I/O and improved cache efficiency making it more able to perform well for OLAP aggregation queries.
+
+
+
+9. When faced with a network partition, the distributed database needs to make a decision regarding consistency or availability.
+
+If the choice is consistency, the database may need to reject requests until there is an agreement between replicas.
+
+If the choice is availability, responses will return but may be stale as a result.
+
+Thus, higher levels of consistency result in the loss of availability during failures; while, at the same time, higher availability results in the loss of immediate consistency.
+
+
+
+10. The selected database is Amazon DynamoDB.
+
+ - 1. The type of data model that is used in DynamoDB is the key-value/document data model.
+Items are stored in DynamoDB by being associated with a primary key ("PK") and have flexible attributes.
+
+ - 2. The characteristics that define units of sharding and replication are as follows:
+Shards (partitions) are created by partitioning data (distribution of data into shards) using the partition key; these shards are automatically replicated across multiple availability zones.
+
+ - 3. The primary type of indexing available is a primary index that DynamoDB automatically creates based on the partition key (and optional sort key), which allows for efficient querying of data and for distributing data across a number of devices.
+
+
+
+11.
+root@3e78a8380826:/# mongosh
+Current Mongosh Log ID:	698accac8de3a9b4fe284d0b
+Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.6.0
+Using MongoDB:		6.0.27
+Using Mongosh:		2.6.0
+
+

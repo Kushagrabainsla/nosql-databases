@@ -1,0 +1,436 @@
+==============================
+Output 1: Show all collections of the database usdata
+==============================
+Command:
+> use usdata
+> show collections
+
+Result:
+cityinfo
+
+==============================
+Output 2: Find all documents of cityinfo collection (limit 10)
+==============================
+Command:
+> db.cityinfo.find().limit(10)
+
+Result:
+[
+  {
+    _id: '01005',
+    city: 'BARRE',
+    loc: [ -72.108354, 42.409698 ],
+    pop: 4546,
+    state: 'MA'
+  },
+  {
+    _id: '01010',
+    city: 'BRIMFIELD',
+    loc: [ -72.188455, 42.116543 ],
+    pop: 3706,
+    state: 'MA'
+  },
+  {
+    _id: '01001',
+    city: 'AGAWAM',
+    loc: [ -72.622739, 42.070206 ],
+    pop: 15338,
+    state: 'MA'
+  },
+  {
+    _id: '01011',
+    city: 'CHESTER',
+    loc: [ -72.988761, 42.279421 ],
+    pop: 1688,
+    state: 'MA'
+  },
+  {
+    _id: '01012',
+    city: 'CHESTERFIELD',
+    loc: [ -72.833309, 42.38167 ],
+    pop: 177,
+    state: 'MA'
+  },
+  {
+    _id: '01013',
+    city: 'CHICOPEE',
+    loc: [ -72.607962, 42.162046 ],
+    pop: 23396,
+    state: 'MA'
+  },
+  {
+    _id: '01020',
+    city: 'CHICOPEE',
+    loc: [ -72.576142, 42.176443 ],
+    pop: 31495,
+    state: 'MA'
+  },
+  {
+    _id: '01022',
+    city: 'WESTOVER AFB',
+    loc: [ -72.558657, 42.196672 ],
+    pop: 1764,
+    state: 'MA'
+  },
+  {
+    _id: '01026',
+    city: 'CUMMINGTON',
+    loc: [ -72.905767, 42.435296 ],
+    pop: 1484,
+    state: 'MA'
+  },
+  {
+    _id: '01002',
+    city: 'CUSHMAN',
+    loc: [ -72.51565, 42.377017 ],
+    pop: 36963,
+    state: 'MA'
+  }
+]
+
+==============================
+Output 3: Find all documents with _id containing 9503, excluding loc field (limit 10)
+==============================
+Command:
+> db.cityinfo.find({_id: /9503/}, {loc: 0}).limit(10)
+
+Result:
+[
+  { _id: '19503', city: 'BALLY', pop: 973, state: 'PA' },
+  { _id: '39503', city: 'GULFPORT', pop: 26830, state: 'MS' },
+  { _id: '49503', city: 'GRAND RAPIDS', pop: 32876, state: 'MI' },
+  { _id: '79503', city: 'AVOCA', pop: 248, state: 'TX' },
+  { _id: '89503', city: 'RENO', pop: 23955, state: 'NV' },
+  { _id: '95030', city: 'MONTE SERENO', pop: 25881, state: 'CA' },
+  { _id: '95032', city: 'LOS GATOS', pop: 18189, state: 'CA' },
+  { _id: '95035', city: 'MILPITAS', pop: 50907, state: 'CA' },
+  { _id: '95037', city: 'MORGAN HILL', pop: 31309, state: 'CA' },
+  { _id: '99503', city: 'ANCHORAGE', pop: 12534, state: 'AK' }
+]
+
+==============================
+Output 4: Aggregate - cities with population between 23,000 and 150,000 in Pacific Ocean states (limit 10)
+==============================
+Command:
+> db.cityinfo.aggregate([
+  { $match: { state: { $in: ["AK", "HI", "WA", "OR", "CA"] } } },
+  { $group: { _id: { city: "$city", state: "$state" }, total_pop: { $sum: "$pop" } } },
+  { $match: { total_pop: { $gte: 23000, $lte: 150000 } } },
+  { $project: { _id: 0, city: "$_id.city", state: "$_id.state", total_pop: "$total_pop" } },
+  { $sort: { state: 1, city: 1 } },
+  { $limit: 10 }
+])
+
+Result:
+[
+  { city: 'FAIRBANKS', state: 'AK', total_pop: 31379 },
+  { city: 'JUNEAU', state: 'AK', total_pop: 24947 },
+  { city: 'WASILLA', state: 'AK', total_pop: 24619 },
+  { city: 'ADELAIDE', state: 'CA', total_pop: 29255 },
+  { city: 'AGUA DULCE', state: 'CA', total_pop: 31741 },
+  { city: 'ALHAMBRA', state: 'CA', total_pop: 81376 },
+  { city: 'ALTA LOMA', state: 'CA', total_pop: 51341 },
+  { city: 'ALTADENA', state: 'CA', total_pop: 36013 },
+  { city: 'AMERICAN CANYON', state: 'CA', total_pop: 37599 },
+  { city: 'ANTIOCH', state: 'CA', total_pop: 62830 }
+]
+
+==============================
+Output 5: Find zip codes in San Jose, New York, and Washington DC with population between 6,000 and 11,000 (limit 10)
+==============================
+Command:
+> db.cityinfo.find(
+  { $or: [ {city: "SAN JOSE", state: "CA"}, {city: "NEW YORK", state: "NY"}, {city: "WASHINGTON", state: "DC"} ], pop: { $gte: 6000, $lte: 11000 } },
+  { loc: 0 }
+).limit(10)
+
+Result:
+[
+  { _id: '10044', city: 'NEW YORK', pop: 8190, state: 'NY' },
+  { _id: '20005', city: 'WASHINGTON', pop: 9862, state: 'DC' },
+  { _id: '20336', city: 'WASHINGTON', pop: 6311, state: 'DC' },
+  { _id: '95119', city: 'SAN JOSE', pop: 9823, state: 'CA' },
+  { _id: '95135', city: 'SAN JOSE', pop: 9104, state: 'CA' },
+  { _id: '95139', city: 'SAN JOSE', pop: 6912, state: 'CA' }
+]
+
+==============================
+Output 6: Add embedded document Details to all Santa Clara County zip codes
+==============================
+Command:
+> db.cityinfo.updateMany(
+  { _id: { $in: ["95009","95008","95013","95014","95020","94085","95023","94087","94086","94089","94088","95031","95030","95033","95032","95035","95037","94301","95042","94303","95044","94305","95050","94304","95046","94306","95051","95054","95070","95103","95108","95111","95110","95113","95112","95117","95116","95119","95118","95121","95120","95123","95122","95125","95124","95127","95126","95129","95128","95131","95130","95133","95132","95135","95134","95136","95139","95138","95141","95140","95148","94550","95151","95150","94022","94024","95190","94028","94035","94040","94042","94041","94043","95002"] } },
+  { $set: { Details: { city: "Santa Clara", medianIncome: 93500 } } }
+)
+
+Result:
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 61,
+  modifiedCount: 61,
+  upsertedCount: 0
+}
+
+==============================
+Output 7: Find all documents with embedded document Details (without using zip code, limit 10)
+==============================
+Command:
+> db.cityinfo.find({ Details: { $exists: true } }, { loc: 0 }).limit(10)
+
+Result:
+[
+  {
+    _id: '94022',
+    city: 'LOS ALTOS',
+    pop: 17366,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94024',
+    city: 'LOS ALTOS',
+    pop: 20795,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94028',
+    city: 'LADERA',
+    pop: 6379,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94040',
+    city: 'MOUNTAIN VIEW',
+    pop: 26969,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94035',
+    city: 'MOFFETT FIELD',
+    pop: 790,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94043',
+    city: 'MOUNTAIN VIEW',
+    pop: 28592,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94041',
+    city: 'MOUNTAIN VIEW',
+    pop: 13438,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94086',
+    city: 'SUNNYVALE',
+    pop: 56215,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94087',
+    city: 'SUNNYVALE',
+    pop: 47813,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  },
+  {
+    _id: '94089',
+    city: 'SUNNYVALE',
+    pop: 13522,
+    state: 'CA',
+    Details: { city: 'Santa Clara', medianIncome: 93500 }
+  }
+]
+
+==============================
+Output 8: MapReduce - population of every state (limit 10, sorted by state)
+==============================
+Command:
+> db.cityinfo.mapReduce(
+  function() { emit(this.state, this.pop); },
+  function(key, values) { return Array.sum(values); },
+  { out: "state_populations_mr" }
+);
+> db.state_populations_mr.find().sort({_id:1}).limit(10)
+
+Result:
+DeprecationWarning: Collection.mapReduce() is deprecated. Use an aggregation instead.
+[
+  { _id: 'AK', value: 544698 },
+  { _id: 'AL', value: 4040587 },
+  { _id: 'AR', value: 2350725 },
+  { _id: 'AZ', value: 3665228 },
+  { _id: 'CA', value: 29754890 },
+  { _id: 'CO', value: 3293755 },
+  { _id: 'CT', value: 3287116 },
+  { _id: 'DC', value: 606900 },
+  { _id: 'DE', value: 666168 },
+  { _id: 'FL', value: 12686644 }
+]
+
+==============================
+Output 9: Aggregate - population of every state (limit 10, sorted by state)
+==============================
+Command:
+> db.cityinfo.aggregate([
+  { $group: { _id: "$state", total_pop: { $sum: "$pop" } } },
+  { $sort: { _id: 1 } },
+  { $limit: 10 }
+])
+
+Result:
+[
+  { _id: 'AK', total_pop: 544698 },
+  { _id: 'AL', total_pop: 4040587 },
+  { _id: 'AR', total_pop: 2350725 },
+  { _id: 'AZ', total_pop: 3665228 },
+  { _id: 'CA', total_pop: 29754890 },
+  { _id: 'CO', total_pop: 3293755 },
+  { _id: 'CT', total_pop: 3287116 },
+  { _id: 'DC', total_pop: 606900 },
+  { _id: 'DE', total_pop: 666168 },
+  { _id: 'FL', total_pop: 12686644 }
+]
+
+==============================
+Output 10: Execution Time Comparison - Queries (a), (b), (c), (d) in ascending order
+==============================
+
+Setup Commands (Run before queries):
+// Insert 100,000+ documents with random SKU values
+for (let i = 0; i < 100000; i++) {
+  let sku = Math.random().toString(36).substring(2, 10); // Random 8-char string
+  db.products.insertOne({ sku: sku });
+}
+db.products.insertMany([
+  { sku: "abc123" },
+  { sku: "ABC456" },
+  { sku: "abcd789" },
+  { sku: "xyz999" },
+  { sku: "XyZS55" }
+]);
+
+// Create Indexes
+db.products.createIndex({ sku: 1 }); // Normal index
+db.products.createIndex(
+  { sku: 1 },
+  { name: "sku_collation", collation: { locale: "en", strength: 2 } }
+); // Collation Index
+
+Query Commands:
+// (a) Case-Insensitive Regex
+db.products.find({ sku: { $regex: /^abc/i } }).explain("executionStats");
+// (b) Case-Insensitive Regex using Collation Index
+db.products.find({ sku: { $regex: /^abc/i } }).collation({ locale: "en", strength: 2 }).explain("executionStats");
+// (c) Case-Sensitive Range Query
+db.products.find({ sku: { $gte: "abc", $lt: "abd" } }).explain("executionStats");
+// (d) Case-Insensitive Range Query using Collation Index
+db.products.find({ sku: { $gte: "abc", $lt: "abd" } }).collation({ locale: "en", strength: 2 }).explain("executionStats");
+
+Execution Times (ascending order):
+  1st (fastest): Query (d) - Case-Insensitive Range Query with Collation Index: 1 ms
+  2nd:           Query (c) - Case-Sensitive Range Query:                        3 ms
+  3rd:           Query (b) - Case-Insensitive Regex with Collation Index:       37 ms
+  4th (slowest): Query (a) - Case-Insensitive Regex:                            38 ms
+
+Summary Table:
+  Query | Description                                  | Time (ms) | Keys Examined | Docs Examined | Index Used
+  ------|----------------------------------------------|-----------|---------------|---------------|--------------------
+  (d)   | Case-Insensitive Range + Collation Index     |     1     |       5       |       5       | sku_collation (IXSCAN)
+  (c)   | Case-Sensitive Range Query                   |     3     |       4       |       4       | sku_1 (IXSCAN)
+  (b)   | Case-Insensitive Regex + Collation Index     |    37     |   100,005     |       5       | sku_1 (IXSCAN)
+  (a)   | Case-Insensitive Regex (no collation)        |    38     |   100,005     |       5       | sku_1 (IXSCAN)
+
+==============================
+Output 11: Why Does the Best-Performing Query Excel? [Query (d)]
+==============================
+
+Query (d) — db.products.find({ sku: { $gte: "abc", $lt: "abd" } }).collation({ locale: "en", strength: 2 }).explain("executionStats")
+
+Query (d) is the fastest (1 ms) for the following reasons:
+
+1. Collation-Aware Index Utilization (IXSCAN on sku_collation):
+   The collation index (sku_collation, strength: 2) stores keys in a locale-aware,
+   case-folded form. When the query specifies the matching collation ({ locale: "en",
+   strength: 2 }), MongoDB's query planner can use the sku_collation index directly
+   for the range scan. This means the engine computes narrow, precise index bounds
+   (CollationKey range) and scans only 5 keys, exactly the number of matching
+   documents.
+
+2. Tight, Bounded Range Scan:
+   A range query ($gte / $lt) with a well-matched index produces tight index bounds.
+   MongoDB enters the B-tree at the lower bound CollationKey("abc") and exits at
+   CollationKey("abd"), touching only the relevant keys. This is far more efficient
+   than scanning the entire index.
+
+3. No Post-Scan Filter Required:
+   Because the collation is baked into the index keys, no additional in-memory
+   filtering is needed after the index scan. Every key examined corresponds to a
+   returned document (keysExamined == nReturned == 5).
+
+4. Case-Insensitivity Without Regex Overhead:
+   By using a range query instead of a regex, MongoDB avoids the overhead of regex
+   evaluation on each candidate. The collation at strength 2 treats "ABC" and "abc"
+   as equal at the key level, so case-insensitivity is handled natively by the index.
+
+==============================
+Output 12: Why Does the Slowest Query Perform Poorly? [Query (a)]
+==============================
+
+Query (a) — db.products.find({ sku: { $regex: /^abc/i } }).explain("executionStats")
+
+Query (a) is the slowest (38 ms) for the following reasons:
+
+1. Regex Cannot Produce Tight Index Bounds:
+   Even though the sku_1 (normal) index is used (IXSCAN), a case-insensitive regex
+   (/^abc/i) cannot be translated into narrow index bounds. The standard B-tree index
+   stores keys in their original byte order, so MongoDB cannot determine a precise
+   range for case-insensitive matching. The index bounds become ["", {}),
+   effectively the entire index range, forcing the engine to scan all 100,005 index
+   keys.
+
+2. Full Index Scan (100,005 keys examined):
+   With such broad bounds, MongoDB must walk through every single key in the sku_1
+   index and apply the regex filter as a secondary predicate on each key. This is
+   analogous to a full collection scan (COLLSCAN) in cost, even though technically
+   an IXSCAN is used. The only benefit is avoiding fully loading documents until a
+   match is found (5 docs examined vs 100,005 keys).
+
+3. Per-Key Regex Evaluation Overhead:
+   For each of the 100,005 index keys, MongoDB must evaluate the case-insensitive
+   regex. Regex matching with the /i flag requires case folding at runtime for every
+   candidate, adding CPU overhead across 100,000+ comparisons.
+
+4. No Collation Index Compatibility:
+   A plain regex query does not activate the collation index (sku_collation), even
+   when a collation is specified with .collation(). MongoDB cannot use a
+   collation-aware index to resolve regex patterns, it can only use it for equality
+   or range comparisons. This means the query is stuck using the standard index with
+   wide bounds.
+
+==============================
+Output 13: SSH Terminal Content - AWS EC2 Instance
+==============================
+
+ssh -i "NoSQL Lab.pem" ec2-user@3.239.212.229
+   ,     #_
+   ~\_  ####_        Amazon Linux 2023
+  ~~  \_#####\
+  ~~     \###|
+  ~~       \#/ ___   https://aws.amazon.com/linux/amazon-linux-2023
+   ~~       V~' '->
+    ~~~         /
+      ~~._.   _/
+         _/ _/
+       _/m/'
+[ec2-user@ip-172-31-13-142 ~]$
