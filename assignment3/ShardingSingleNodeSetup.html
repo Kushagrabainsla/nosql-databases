@@ -1,0 +1,835 @@
+
+<!-- saved from url=(0082)https://www.cs.sjsu.edu/~kim/cs157c/contents/handouts/ShardingSingleNodeSetup.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body data-new-gr-c-s-check-loaded="14.1248.0" data-gr-ext-installed=""><center>
+<h4>CS157C: NoSQL Database Systems</h4><h4>
+</h4><h3>Deplying Sharding on a Single Server </h3>
+<h4>Instructor: Dr. Kim </h4>
+</center>
+<hr>
+<ul>
+<li> The $ sign in this document means a prompt from a Ubuntu Docker container. </li><li> Test Configuration: The config server is replicated in a replica set of three members. 
+Three shards are deployed and each shard is replicated in a replica set of three members. 
+
+</li></ul>
+<center>
+<table border="1">
+<tbody><tr> <td>Service</td> <td>Daemon </td> <td>Port(s)</td> <td>DB path</td>  </tr>
+<tr> <td>Shard Controller </td> <td>mongos </td> <td>27021   </td> <td>N/A</td></tr>
+<tr> <td>Config Server  </td> <td>mongod </td> <td>27022  </td> <td>/db/config/data</td></tr>
+<tr> <td>Replica Set a (for shard a)</td> <td>mongod</td> <td>26000, 26001, 26002   </td> <td>a0, a1, a2</td></tr>
+<tr> <td>Replica Set b (for shard b)</td> <td>mongod</td> <td>26100, 26101, 26102   </td> <td>b0, b1, b2</td></tr>
+<tr> <td>Replica Set c (for shard c)</td> <td>mongod</td> <td>26200, 26201, 26202   </td> <td>c0, c1, c2</td></tr>
+
+</tbody></table>
+</center>
+
+<h3> I. Set up a replica set of one config server </h3>
+
+1. Create a directory
+<pre>$ mkdir -p /db/config/data
+</pre>
+
+2. Start a mongod serving as a config server
+<pre>$ mongod --port 27022 --dbpath /db/config/data --configsvr --replSet config
+</pre>
+
+3. In a new window, initialize the replica set 
+<pre>$ mongosh --port 27022
+
+test&gt;  rs.initiate()
+{
+  info2: 'no configuration specified. Using a default configuration for the set',
+  me: 'localhost:27022',
+  ok: 1,
+  '$gleStats': {
+    lastOpTime: Timestamp({ t: 1647406242, i: 1 }),
+    electionId: ObjectId("000000000000000000000000")
+  },
+  lastCommittedOpTime: Timestamp({ t: 1647406242, i: 1 })
+}
+
+config [direct: other] test&gt;
+
+</pre>
+
+<h3>II.  Set up the shard controller (mongos) in a new window </h3>
+
+<pre>$ mongos --configdb config/127.0.0.1:27022 --port 27021  
+</pre>
+The mongos is going to listen on port 27021 and also identifies the config server called config/127.0.0.1:27022
+
+
+<h3>III. Configure three replica sets, one for each shard</h3>
+
+
+1. Make directories for replica set members
+
+<pre>$ mkdir a0 a1 a2 b0 b1 b2 c0 c1 c2
+</pre>
+
+2. Start mongods, one for each member of replica sets. 
+<pre>$ mongod --shardsvr --replSet a --dbpath a0 --port 26000 --fork --logpath log.a0
+
+about to fork child process, waiting until server is ready for connections.
+forked process: 538
+child process started successfully, parent exiting
+
+$ mongod --shardsvr --replSet a --dbpath a1 --port 26001 --fork --logpath log.a1
+$ mongod --shardsvr --replSet a --dbpath a2 --port 26002 --fork --logpath log.a2 
+
+$ mongod --shardsvr --replSet b --dbpath b0 --port 26100 --fork --logpath log.b0 
+$ mongod --shardsvr --replSet b --dbpath b1 --port 26101 --fork --logpath log.b1
+$ mongod --shardsvr --replSet b --dbpath b2 --port 26102 --fork --logpath log.b2
+
+$ mongod --shardsvr --replSet c --dbpath c0 --port 26200 --fork --logpath log.c0
+$ mongod --shardsvr --replSet c --dbpath c1 --port 26201 --fork --logpath log.c1
+$ mongod --shardsvr --replSet c --dbpath c2 --port 26202 --fork --logpath log.c2
+
+</pre>
+3. In a new terminal, connect to one of the member of the replica set a, initiate the replica set, and add the rest of the members to the replica set.  
+
+<pre>$mongosh --port 26000
+&gt; rs.initiate()
+test&gt; rs.initiate()
+{
+  info2: 'no configuration specified. Using a default configuration for the set',
+  me: 'localhost:26000',
+  ok: 1
+}
+a [direct: other] test&gt; 
+
+a [direct: other] test&gt; rs.add("localhost:26001");
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1647406781, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1647406781, i: 1 })
+}
+
+a [direct: primary] test&gt; rs.add("localhost:26002")
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1647406821, i: 1 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1647406821, i: 1 })
+}
+
+a [direct: primary] test&gt; rs.status()
+
+a [direct: primary] test&gt;exit 
+
+</pre>
+4. Do the same for the replica sets b 
+
+<pre>$ mongosh --port 26100
+
+&gt; rs.initiate()
+&gt; rs.add("localhost:26101");
+&gt; rs.add("localhost:26102");
+&gt; rs.status()
+&gt; exit
+</pre>
+
+5. Do the same for the replica sets c 
+
+<pre>
+$ mongosh --port 26200
+&gt; rs.initiate()
+&gt; rs.add("localhost:26201");
+&gt; rs.add("localhost:26202");
+&gt; rs.status()
+&gt; exit
+</pre>
+
+
+6. Connect to mongos and addShard. For now, just add two shards. 
+
+<pre>$ mongosh localhost:27021
+[direct: mongos] test&gt; sh.addShard("a/localhost:26000")
+[direct: mongos] test&gt; sh.addShard("b/localhost:26100")
+
+
+</pre>
+
+7. Check the shards (before populating data)
+
+<pre>[direct: mongos] test&gt; sh.status()
+shardingVersion
+{
+  _id: 1,
+  minCompatibleVersion: 5,
+  currentVersion: 6,
+  clusterId: ObjectId("62316ca2d12efc762392475d")
+}
+---
+shards
+[
+  {
+    _id: 'a',
+    host: 'a/localhost:26000,localhost:26001,localhost:26002',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407378, i: 2 })
+  },
+  {
+    _id: 'b',
+    host: 'b/localhost:26100,localhost:26101,localhost:26102',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407385, i: 3 })
+  }
+]
+---
+active mongoses
+[ { '5.0.6': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently enabled': 'yes',
+  'Currently running': 'no',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': 'No recent migrations'
+}
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {}
+  }
+]
+[direct: mongos] test&gt;  exit
+
+</pre>
+
+8. Enabling a database for sharding is a prerequisite to sharding on of its collection
+<pre>
+[direct: mongos] test&gt; sh.enableSharding("testdb")
+{
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1647407635, i: 4 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1647407635, i: 3 })
+}
+
+
+</pre>
+9. The <b>testcollection</b> will be sharded using the shard key <b>testkey</b>.
+<pre>
+[direct: mongos] test&gt; sh.shardCollection("testdb.testcollection", {testkey:1})
+{
+  collectionsharded: 'testdb.testcollection',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1647407660, i: 28 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1647407660, i: 24 })
+}
+
+
+
+</pre>
+<h3>IV. Modifying the chunk size for testing purposes</h3>
+The default chunk size for a sharded cluster is 64 megabytes. We are reducing the chunk size to 1 MB for testing purposes, otherwise, chunk splitting and migratinon will not happen with the following test data. 
+<pre>mongos&gt; use config
+switched to db config
+
+mongos&gt; db.settings.updateOne(
+   { _id: "chunksize" },
+   { $set: { _id: "chunksize", value: 1} },
+   { upsert: true }
+)
+
+
+</pre>
+
+<h3>V. Populating data in the testdb.testcollection</h3>
+
+1. Insert 100,000 documents. The following loop will take a while to be done. 
+
+<pre>
+[direct: mongos] config&gt; use testdb
+
+[direct: mongos] testdb&gt; for (var i = 0; i &lt; 100000; i++) { db.testcollection.insertOne({"testkey":"key"+i}) }
+
+{
+	"acknowledged" : true,
+	"insertedId" : ObjectId("5e6179bbfd81d54c6fdbdc72")
+}
+
+
+</pre>
+
+2. Check the total number of documents at mongos and the number of 
+documents in each shard. 
+<pre>
+[direct: mongos] testdb&gt; db.testcollection.countDocuments()
+100000
+</pre>
+3. Conect one of the member of the replica set a and check the number of documents .
+In a docker container, 
+<pre>$ mongosh localhost:26000 
+a [direct: secondary] test&gt; use testdb
+switched to db testdb
+</pre>
+If you connected to a secondary,  do setReadPref(). 
+<pre>[direct: secondary] testdb&gt; db.getMongo().setReadPref("secondary")
+&gt;db.getMongo().setReadPref("secondary")
+
+a [direct: secondary] testdb&gt; db.testcollection.countDocuments()
+21597
+
+</pre>
+4. Connect one of the member of the replica set b and check the number of documents .
+In a docker container, 
+<pre>$ mongosh localhost:26100
+
+b [direct: primary] test&gt;
+</pre>
+
+If you connect to the primary, you don't need to setRefPref to secondary. 
+
+<pre>b [direct: primary] test&gt; use testdb
+switched to db testdb
+
+b [direct: primary] testdb&gt; db.testcollection.countDocuments()
+99988
+
+</pre>
+
+OR you can connect ot mongos and  check the document count in each shard by 
+<pre>[direct: mongos] testdb&gt; db.testcollection.getShardDistribution()
+Shard a at a/localhost:26000,localhost:26001,localhost:26002
+{
+  data: '925KiB',
+  docs: 21597,
+  chunks: 3,
+  'estimated data per chunk': '308KiB',
+  'estimated docs per chunk': 7199
+}
+---
+Shard b at b/localhost:26100,localhost:26101,localhost:26102
+{
+  data: '4.18MiB',
+  docs: 99988,
+  chunks: 4,
+  'estimated data per chunk': '1.04MiB',
+  'estimated docs per chunk': 24997
+}
+---
+Totals
+{
+  data: '5.08MiB',
+  docs: 121585,
+  chunks: 7,
+  'Shard a': [
+    '17.76 % data',
+    '17.76 % docs in cluster',
+    '43B avg obj size on shard'
+  ],
+  'Shard b': [
+    '82.23 % data',
+    '82.23 % docs in cluster',
+    '43B avg obj size on shard'
+  ]
+}
+[direct: mongos] testdb&gt; 
+
+
+</pre>
+
+5. Check the shard status (after populating data)
+
+<pre>[direct: mongos] testdb&gt; sh.status()
+shardingVersion
+{
+  _id: 1,
+  minCompatibleVersion: 5,
+  currentVersion: 6,
+  clusterId: ObjectId("62316ca2d12efc762392475d")
+}
+---
+shards
+[
+  {
+    _id: 'a',
+    host: 'a/localhost:26000,localhost:26001,localhost:26002',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407378, i: 2 })
+  },
+  {
+    _id: 'b',
+    host: 'b/localhost:26100,localhost:26101,localhost:26102',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407385, i: 3 })
+  }
+]
+---
+active mongoses
+[ { '5.0.6': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently enabled': 'yes',
+  'Currently running': 'no',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': { '515': 'Success' }
+}
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {
+      'config.system.sessions': {
+        shardKey: { _id: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [ { shard: 'a', nChunks: 512 }, { shard: 'b', nChunks: 512 } ],
+        chunks: [
+          'too many chunks to print, use verbose if you want to force print'
+        ],
+        tags: []
+      }
+    }
+  },
+  {
+    database: {
+      _id: 'testdb',
+      primary: 'b',
+      partitioned: true,
+      version: {
+        uuid: UUID("4fe8ad3c-a4d7-4972-89a3-dfb6445e92b8"),
+        timestamp: Timestamp({ t: 1647407635, i: 1 }),
+        lastMod: 1
+      }
+    },
+    collections: {
+      'testdb.testcollection': {
+        shardKey: { testkey: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [ { shard: 'a', nChunks: 3 }, { shard: 'b', nChunks: 4 } ],
+        chunks: [
+          { min: { testkey: MinKey() }, max: { testkey: 'key1' }, 'on shard': 'a', 'last modified': Timestamp({ t: 2, i: 0 }) },
+          { min: { testkey: 'key1' }, max: { testkey: 'key29425' }, 'on shard': 'a', 'last modified': Timestamp({ t: 4, i: 0 }) },
+          { min: { testkey: 'key29425' }, max: { testkey: 'key45574' }, 'on shard': 'b', 'last modified': Timestamp({ t: 4, i: 1 }) },
+          { min: { testkey: 'key45574' }, max: { testkey: 'key62228' }, 'on shard': 'b', 'last modified': Timestamp({ t: 3, i: 6 }) },
+          { min: { testkey: 'key62228' }, max: { testkey: 'key77007' }, 'on shard': 'b', 'last modified': Timestamp({ t: 4, i: 2 }) },
+          { min: { testkey: 'key77007' }, max: { testkey: 'key9999' }, 'on shard': 'b', 'last modified': Timestamp({ t: 4, i: 3 }) },
+          { min: { testkey: 'key9999' }, max: { testkey: MaxKey() }, 'on shard': 'a', 'last modified': Timestamp({ t: 3, i: 0 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+]
+[direct: mongos] testdb&gt; 
+</pre>
+
+
+
+<h3>VI. Adding the third shard  to the sharded cluster </h3>
+
+1. Add the third shard to the replica set c you prepared. 
+
+<pre>[direct: mongos] testdb&gt;  sh.addShard("c/localhost:26200")
+{
+  shardAdded: 'c',
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1647409520, i: 4 }),
+    signature: {
+      hash: Binary(Buffer.from("0000000000000000000000000000000000000000", "hex"), 0),
+      keyId: Long("0")
+    }
+  },
+  operationTime: Timestamp({ t: 1647409520, i: 4 })
+}
+
+</pre>
+2. Check the status of the sharded cluster after adding the third shard. 
+<pre>
+
+[direct: mongos] testdb&gt; sh.status()
+shardingVersion
+{
+  _id: 1,
+  minCompatibleVersion: 5,
+  currentVersion: 6,
+  clusterId: ObjectId("62316ca2d12efc762392475d")
+}
+---
+shards
+[
+  {
+    _id: 'a',
+    host: 'a/localhost:26000,localhost:26001,localhost:26002',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407378, i: 2 })
+  },
+  {
+    _id: 'b',
+    host: 'b/localhost:26100,localhost:26101,localhost:26102',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407385, i: 3 })
+  },
+  {
+    _id: 'c',
+    host: 'c/localhost:26200,localhost:26201,localhost:26202',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647409520, i: 2 })
+  }
+]
+
+---
+active mongoses
+[ { '5.0.6': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently enabled': 'yes',
+  'Currently running': 'no',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': { '565': 'Success' }
+}
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {
+      'config.system.sessions': {
+        shardKey: { _id: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [
+          { shard: 'a', nChunks: 488 },
+          { shard: 'b', nChunks: 488 },
+          { shard: 'c', nChunks: 48 }
+        ],
+        chunks: [
+          'too many chunks to print, use verbose if you want to force print'
+        ],
+        tags: []
+      }
+    }
+  },
+  {
+    database: {
+      _id: 'testdb',
+      primary: 'b',
+      partitioned: true,
+      version: {
+        uuid: UUID("4fe8ad3c-a4d7-4972-89a3-dfb6445e92b8"),
+        timestamp: Timestamp({ t: 1647407635, i: 1 }),
+        lastMod: 1
+      }
+    },
+    collections: {
+      'testdb.testcollection': {
+        shardKey: { testkey: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [
+          { shard: 'a', nChunks: 3 },
+          { shard: 'b', nChunks: 2 },
+          { shard: 'c', nChunks: 2 }
+        ],
+        chunks: [
+          { min: { testkey: MinKey() }, max: { testkey: 'key1' }, 'on shard': 'a', 'last modified': Timestamp({ t: 2, i: 0 }) },
+          { min: { testkey: 'key1' }, max: { testkey: 'key29425' }, 'on shard': 'a', 'last modified': Timestamp({ t: 4, i: 0 }) },
+          { min: { testkey: 'key29425' }, max: { testkey: 'key45574' }, 'on shard': 'c', 'last modified': Timestamp({ t: 5, i: 0 }) },
+          { min: { testkey: 'key45574' }, max: { testkey: 'key62228' }, 'on shard': 'c', 'last modified': Timestamp({ t: 6, i: 0 }) },
+          { min: { testkey: 'key62228' }, max: { testkey: 'key77007' }, 'on shard': 'b', 'last modified': Timestamp({ t: 6, i: 1 }) },
+          { min: { testkey: 'key77007' }, max: { testkey: 'key9999' }, 'on shard': 'b', 'last modified': Timestamp({ t: 4, i: 3 }) },
+          { min: { testkey: 'key9999' }, max: { testkey: MaxKey() }, 'on shard': 'a', 'last modified': Timestamp({ t: 3, i: 0 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+]
+[direct: mongos] testdb&gt; 
+
+
+
+
+mongos&gt; 
+</pre>
+
+3. Check the number of documents in shard a, shard b and shard c.  
+<pre>[direct: mongos] testdb&gt; db.testcollection.getShardDistribution()
+Shard b at b/localhost:26100,localhost:26101,localhost:26102
+{
+  data: '3.28MiB',
+  docs: 78403,
+  chunks: 2,
+  'estimated data per chunk': '1.64MiB',
+  'estimated docs per chunk': 39201
+}
+---
+Shard a at a/localhost:26000,localhost:26001,localhost:26002
+{
+  data: '925KiB',
+  docs: 21597,
+  chunks: 3,
+  'estimated data per chunk': '308KiB',
+  'estimated docs per chunk': 7199
+}
+---
+Shard c at c/localhost:26200,localhost:26201,localhost:26202
+{
+  data: '1.52MiB',
+  docs: 36448,
+  chunks: 2,
+  'estimated data per chunk': '781KiB',
+  'estimated docs per chunk': 18224
+}
+---
+Totals
+{
+  data: '5.71MiB',
+  docs: 136448,
+  chunks: 7,
+  'Shard b': [
+    '57.46 % data',
+    '57.45 % docs in cluster',
+    '43B avg obj size on shard'
+  ],
+  'Shard a': [
+    '15.82 % data',
+    '15.82 % docs in cluster',
+    '43B avg obj size on shard'
+  ],
+  'Shard c': [
+    '26.71 % data',
+    '26.71 % docs in cluster',
+    '43B avg obj size on shard'
+  ]
+}
+[direct: mongos] testdb&gt; 
+</pre>
+
+4.  Now, insert additonal 100000 documents to the sharded cluster and check the number of documents in each shard. 
+
+<pre>[direct: mongos] testdb&gt; for (var i = 100000; i &lt; 200000; i++) { db.testcollection.insertOne({"testkey":"key"+i}) }
+
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("5e6179bbfd81d54c6fdbdc72")
+}
+<pre>
+[direct: mongos] testdb&gt; db.testcollection.getShardDistribution()
+Shard b at b/localhost:26100,localhost:26101,localhost:26102
+{
+  data: '3.38MiB',
+  docs: 79913,
+  chunks: 4,
+  'estimated data per chunk': '865KiB',
+  'estimated docs per chunk': 19978
+}
+---
+Shard a at a/localhost:26000,localhost:26001,localhost:26002
+{
+  data: '2.79MiB',
+  docs: 65424,
+  chunks: 4,
+  'estimated data per chunk': '714KiB',
+  'estimated docs per chunk': 16356
+}
+---
+Shard c at c/localhost:26200,localhost:26201,localhost:26202
+{
+  data: '2.3MiB',
+  docs: 54663,
+  chunks: 4,
+  'estimated data per chunk': '590KiB',
+  'estimated docs per chunk': 13665
+}
+---
+Totals
+{
+  data: '8.47MiB',
+  docs: 200000,
+  chunks: 12,
+  'Shard b': [
+    '39.88 % data',
+    '39.95 % docs in cluster',
+    '44B avg obj size on shard'
+  ],
+  'Shard a': [
+    '32.92 % data',
+    '32.71 % docs in cluster',
+    '44B avg obj size on shard'
+  ],
+  'Shard c': [
+    '27.19 % data',
+    '27.33 % docs in cluster',
+    '44B avg obj size on shard'
+  ]
+}
+[direct: mongos] testdb&gt; 
+
+
+</pre>
+5. Check the final shard status. 
+<pre>[direct: mongos] testdb&gt; sh.status()
+shardingVersion
+{
+  _id: 1,
+  minCompatibleVersion: 5,
+  currentVersion: 6,
+  clusterId: ObjectId("62316ca2d12efc762392475d")
+}
+---
+shards
+[
+  {
+    _id: 'a',
+    host: 'a/localhost:26000,localhost:26001,localhost:26002',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407378, i: 2 })
+  },
+  {
+    _id: 'b',
+    host: 'b/localhost:26100,localhost:26101,localhost:26102',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647407385, i: 3 })
+  },
+  {
+    _id: 'c',
+    host: 'c/localhost:26200,localhost:26201,localhost:26202',
+    state: 1,
+    topologyTime: Timestamp({ t: 1647409520, i: 2 })
+  }
+]
+---
+active mongoses
+[ { '5.0.6': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently enabled': 'yes',
+  'Currently running': 'no',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': { '862': 'Success' }
+}
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {
+      'config.system.sessions': {
+        shardKey: { _id: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [
+          { shard: 'a', nChunks: 341 },
+          { shard: 'b', nChunks: 342 },
+          { shard: 'c', nChunks: 341 }
+        ],
+        chunks: [
+          'too many chunks to print, use verbose if you want to force print'
+        ],
+        tags: []
+      }
+    }
+  },
+  {
+    database: {
+      _id: 'testdb',
+      primary: 'b',
+      partitioned: true,
+      version: {
+        uuid: UUID("4fe8ad3c-a4d7-4972-89a3-dfb6445e92b8"),
+        timestamp: Timestamp({ t: 1647407635, i: 1 }),
+        lastMod: 1
+      }
+    },
+    collections: {
+      'testdb.testcollection': {
+        shardKey: { testkey: 1 },
+        unique: false,
+        balancing: true,
+        chunkMetadata: [
+          { shard: 'a', nChunks: 4 },
+          { shard: 'b', nChunks: 4 },
+          { shard: 'c', nChunks: 4 }
+        ],
+        chunks: [
+          { min: { testkey: MinKey() }, max: { testkey: 'key1' }, 'on shard': 'c', 'last modified': Timestamp({ t: 7, i: 0 }) },
+          { min: { testkey: 'key1' }, max: { testkey: 'key116390' }, 'on shard': 'b', 'last modified': Timestamp({ t: 8, i: 0 }) },
+          { min: { testkey: 'key116390' }, max: { testkey: 'key13416' }, 'on shard': 'b', 'last modified': Timestamp({ t: 9, i: 0 }) },
+          { min: { testkey: 'key13416' }, max: { testkey: 'key150552' }, 'on shard': 'c', 'last modified': Timestamp({ t: 10, i: 0 }) },
+          { min: { testkey: 'key150552' }, max: { testkey: 'key165040' }, 'on shard': 'a', 'last modified': Timestamp({ t: 10, i: 1 }) },
+          { min: { testkey: 'key165040' }, max: { testkey: 'key1807' }, 'on shard': 'a', 'last modified': Timestamp({ t: 9, i: 2 }) },
+          { min: { testkey: 'key1807' }, max: { testkey: 'key29425' }, 'on shard': 'a', 'last modified': Timestamp({ t: 9, i: 3 }) },
+          { min: { testkey: 'key29425' }, max: { testkey: 'key45574' }, 'on shard': 'c', 'last modified': Timestamp({ t: 5, i: 0 }) },
+          { min: { testkey: 'key45574' }, max: { testkey: 'key62228' }, 'on shard': 'c', 'last modified': Timestamp({ t: 6, i: 0 }) },
+          { min: { testkey: 'key62228' }, max: { testkey: 'key77007' }, 'on shard': 'b', 'last modified': Timestamp({ t: 6, i: 1 }) },
+          { min: { testkey: 'key77007' }, max: { testkey: 'key9999' }, 'on shard': 'b', 'last modified': Timestamp({ t: 4, i: 3 }) },
+          { min: { testkey: 'key9999' }, max: { testkey: MaxKey() }, 'on shard': 'a', 'last modified': Timestamp({ t: 3, i: 0 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+]
+[direct: mongos] testdb&gt; 
+
+</pre>
+
+
+
+</pre></body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;limited&quot;,&quot;isActive&quot;:false,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>

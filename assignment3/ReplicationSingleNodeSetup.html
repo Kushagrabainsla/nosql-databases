@@ -1,0 +1,489 @@
+
+<!-- saved from url=(0085)https://www.cs.sjsu.edu/~kim/cs157c/contents/handouts/ReplicationSingleNodeSetup.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body data-new-gr-c-s-check-loaded="14.1248.0" data-gr-ext-installed=""><center>
+<h4>CS157C: NoSQL Database Systems</h4><h4>
+</h4><h3>Deploying a MongoDB Replica Set of 3 members on a Single Server </h3>
+<h4>Instructor: Dr. Kim </h4>
+</center>
+<hr>
+
+<ul>
+<li>Reference: The Definitive Guide to MongoDB, 3rd Edition, by David Howes, et al. 
+
+</li><li>A replica set to configure
+<pre>Service	Daemon	Address	Dbpath
+Member 1	mongod	[hostname]:27021	/db/active1/data
+Member 2	mongod	[hostname]:27022	/db/active2/data
+Member 3	mongod	[hostname]:27023	/db/passive1/data
+</pre>		
+</li><li>Preperation: Create a Ubuntu Docker container dedicated to this deployment and setup MongoDB in the container. In the following instruction, $ is a prompt from the Ubuntu Docker container.  
+</li></ul>
+<hr>
+1. In the Docker container, create the necessary data directories for each member 
+<pre>$ mkdir -p /db/active1/data /db/active2/data /db/passive1/data
+</pre>
+2. Open three windows. Enter the Docker container in each window where you will  start mongod working on the assigned port as shown below. 
+<pre>$ sudo mongod --port 27021 --dbpath /db/active1/data --replSet testset
+$ sudo mongod --port 27022 --dbpath /db/active2/data --replSet testset
+$ sudo mongod --port 27023 --dbpath /db/passive1/data --replSet testset
+
+</pre>
+3. Connect to one of your mongod instance,initiate the replica set, and check the status of the replica set. 
+<pre> 
+$ mongo 127.0.0.1:27021
+&gt; rs.initiate()
+{
+	"info2" : "no configuration specified. Using a default configuration for the set",
+	"me" : "localhost:27021",
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582992158, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582992158, 1)
+}
+
+testset:SECONDARY&gt; rs.status()
+{
+	"set" : "testset",
+	"date" : ISODate("2020-02-29T16:02:58.771Z"),
+	"myState" : 1,
+	"term" : NumberLong(1),
+	"syncingTo" : "",
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"majorityVoteCount" : 1,
+	"writeMajorityCount" : 1,
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1582992160, 5),
+			"t" : NumberLong(1)
+		},
+		"lastCommittedWallTime" : ISODate("2020-02-29T16:02:40.183Z"),
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1582992160, 5),
+			"t" : NumberLong(1)
+		},
+		"readConcernMajorityWallTime" : ISODate("2020-02-29T16:02:40.183Z"),
+		"appliedOpTime" : {
+			"ts" : Timestamp(1582992160, 5),
+			"t" : NumberLong(1)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1582992160, 5),
+			"t" : NumberLong(1)
+		},
+		"lastAppliedWallTime" : ISODate("2020-02-29T16:02:40.183Z"),
+		"lastDurableWallTime" : ISODate("2020-02-29T16:02:40.183Z")
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1582992160, 2),
+	"lastStableCheckpointTimestamp" : Timestamp(1582992160, 2),
+	"electionCandidateMetrics" : {
+		"lastElectionReason" : "electionTimeout",
+		"lastElectionDate" : ISODate("2020-02-29T16:02:39.063Z"),
+		"electionTerm" : NumberLong(1),
+		"lastCommittedOpTimeAtElection" : {
+			"ts" : Timestamp(0, 0),
+			"t" : NumberLong(-1)
+		},
+		"lastSeenOpTimeAtElection" : {
+			"ts" : Timestamp(1582992158, 1),
+			"t" : NumberLong(-1)
+		},
+		"numVotesNeeded" : 1,
+		"priorityAtElection" : 1,
+		"electionTimeoutMillis" : NumberLong(10000),
+		"newTermStartDate" : ISODate("2020-02-29T16:02:40.109Z"),
+		"wMajorityWriteAvailabilityDate" : ISODate("2020-02-29T16:02:40.170Z")
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "localhost:27021",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 468,
+			"optime" : {
+				"ts" : Timestamp(1582992160, 5),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2020-02-29T16:02:40Z"),
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "could not find member to sync from",
+			"electionTime" : Timestamp(1582992159, 1),
+			"electionDate" : ISODate("2020-02-29T16:02:39Z"),
+			"configVersion" : 1,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		}
+	],
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582992160, 5),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582992160, 5)
+}
+testset:PRIMARY&gt; 
+</pre>
+
+4. Add the rest of the members to the replica set and check the status of the replica set. 
+<pre> 
+
+testset:PRIMARY&gt; rs.add("127.0.0.1:27022")
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582992622, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582992622, 1)
+}
+
+testset:PRIMARY&gt; rs.add("127.0.0.1:27023")
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582992645, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582992645, 1)
+}
+
+testset:PRIMARY&gt; rs.status()
+{
+	"set" : "testset",
+	"date" : ISODate("2020-02-29T16:11:02.664Z"),
+	"myState" : 1,
+	"term" : NumberLong(1),
+	"syncingTo" : "",
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"majorityVoteCount" : 2,
+	"writeMajorityCount" : 2,
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1582992645, 1),
+			"t" : NumberLong(1)
+		},
+		"lastCommittedWallTime" : ISODate("2020-02-29T16:10:45.341Z"),
+		"readConcernMajorityOpTime" : {
+			"ts" : Timestamp(1582992645, 1),
+			"t" : NumberLong(1)
+		},
+		"readConcernMajorityWallTime" : ISODate("2020-02-29T16:10:45.341Z"),
+		"appliedOpTime" : {
+			"ts" : Timestamp(1582992662, 1),
+			"t" : NumberLong(1)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1582992662, 1),
+			"t" : NumberLong(1)
+		},
+		"lastAppliedWallTime" : ISODate("2020-02-29T16:11:02.058Z"),
+		"lastDurableWallTime" : ISODate("2020-02-29T16:11:02.058Z")
+	},
+	"lastStableRecoveryTimestamp" : Timestamp(1582992645, 1),
+	"lastStableCheckpointTimestamp" : Timestamp(1582992645, 1),
+	"electionCandidateMetrics" : {
+		"lastElectionReason" : "electionTimeout",
+		"lastElectionDate" : ISODate("2020-02-29T16:02:39.063Z"),
+		"electionTerm" : NumberLong(1),
+		"lastCommittedOpTimeAtElection" : {
+			"ts" : Timestamp(0, 0),
+			"t" : NumberLong(-1)
+		},
+		"lastSeenOpTimeAtElection" : {
+			"ts" : Timestamp(1582992158, 1),
+			"t" : NumberLong(-1)
+		},
+		"numVotesNeeded" : 1,
+		"priorityAtElection" : 1,
+		"electionTimeoutMillis" : NumberLong(10000),
+		"newTermStartDate" : ISODate("2020-02-29T16:02:40.109Z"),
+		"wMajorityWriteAvailabilityDate" : ISODate("2020-02-29T16:02:40.170Z")
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "localhost:27021",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 952,
+			"optime" : {
+				"ts" : Timestamp(1582992662, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2020-02-29T16:11:02Z"),
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"electionTime" : Timestamp(1582992159, 1),
+			"electionDate" : ISODate("2020-02-29T16:02:39Z"),
+			"configVersion" : 3,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		},
+		{
+			"_id" : 1,
+			"name" : "127.0.0.1:27022",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 40,
+			"optime" : {
+				"ts" : Timestamp(1582992645, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1582992645, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2020-02-29T16:10:45Z"),
+			"optimeDurableDate" : ISODate("2020-02-29T16:10:45Z"),
+			"lastHeartbeat" : ISODate("2020-02-29T16:11:01.375Z"),
+			"lastHeartbeatRecv" : ISODate("2020-02-29T16:11:02.477Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"configVersion" : 3
+		},
+		{
+			"_id" : 2,
+			"name" : "127.0.0.1:27023",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 17,
+			"optime" : {
+				"ts" : Timestamp(1582992645, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1582992645, 1),
+				"t" : NumberLong(1)
+			},
+			"optimeDate" : ISODate("2020-02-29T16:10:45Z"),
+			"optimeDurableDate" : ISODate("2020-02-29T16:10:45Z"),
+			"lastHeartbeat" : ISODate("2020-02-29T16:11:01.374Z"),
+			"lastHeartbeatRecv" : ISODate("2020-02-29T16:11:02.359Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"configVersion" : 3
+		}
+	],
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582992662, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582992662, 1)
+}
+testset:PRIMARY&gt; 
+
+</pre>
+5. Check the current configuration of the repica set and get the cursor to the configuration document. The cursor conf will be used to change the configuration parameter later. 
+<pre>testset:PRIMARY&gt; conf = rs.conf()
+{
+	"_id" : "testset",
+	"version" : 3,
+	"protocolVersion" : NumberLong(1),
+	"writeConcernMajorityJournalDefault" : true,
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "localhost:27021",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 1,
+			"host" : "127.0.0.1:27022",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 2,
+			"host" : "127.0.0.1:27023",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		}
+	],
+	"settings" : {
+		"chainingAllowed" : true,
+		"heartbeatIntervalMillis" : 2000,
+		"heartbeatTimeoutSecs" : 10,
+		"electionTimeoutMillis" : 10000,
+		"catchUpTimeoutMillis" : -1,
+		"catchUpTakeoverDelayMillis" : 30000,
+		"getLastErrorModes" : {
+			
+		},
+		"getLastErrorDefaults" : {
+			"w" : 1,
+			"wtimeout" : 0
+		},
+		"replicaSetId" : ObjectId("5e5a8b1e1fa20b63771e7ab1")
+	}
+}
+</pre>
+
+6. Hide one of the members, set its priority to 0, and reconfigure the replica set. 
+<pre>	
+testset:PRIMARY&gt; conf.members[2].hidden = true
+true
+
+testset:PRIMARY&gt; conf.members[2].priority = 0
+0
+
+tset:PRIMARY&gt; conf
+{
+	"_id" : "testset",
+	"version" : 3,
+	"protocolVersion" : NumberLong(1),
+	"writeConcernMajorityJournalDefault" : true,
+	"members" : [
+		{
+			"_id" : 0,
+			"host" : "localhost:27021",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 1,
+			"host" : "127.0.0.1:27022",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : false,
+			"priority" : 1,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		},
+		{
+			"_id" : 2,
+			"host" : "127.0.0.1:27023",
+			"arbiterOnly" : false,
+			"buildIndexes" : true,
+			"hidden" : true,
+			"priority" : 0,
+			"tags" : {
+				
+			},
+			"slaveDelay" : NumberLong(0),
+			"votes" : 1
+		}
+	],
+	"settings" : {
+		"chainingAllowed" : true,
+		"heartbeatIntervalMillis" : 2000,
+		"heartbeatTimeoutSecs" : 10,
+		"electionTimeoutMillis" : 10000,
+		"catchUpTimeoutMillis" : -1,
+		"catchUpTakeoverDelayMillis" : 30000,
+		"getLastErrorModes" : {
+			
+		},
+		"getLastErrorDefaults" : {
+			"w" : 1,
+			"wtimeout" : 0
+		},
+		"replicaSetId" : ObjectId("5e5a8b1e1fa20b63771e7ab1")
+	}
+}
+testset:PRIMARY&gt; 
+testset:PRIMARY&gt; rs.reconfig(conf)
+{
+	"ok" : 1,
+	"$clusterTime" : {
+		"clusterTime" : Timestamp(1582993046, 1),
+		"signature" : {
+			"hash" : BinData(0,"AAAAAAAAAAAAAAAAAAAAAAAAAAA="),
+			"keyId" : NumberLong(0)
+		}
+	},
+	"operationTime" : Timestamp(1582993046, 1)
+}
+</pre>
+
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;limited&quot;,&quot;isActive&quot;:false,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>

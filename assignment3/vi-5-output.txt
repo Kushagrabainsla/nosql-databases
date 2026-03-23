@@ -1,0 +1,155 @@
+shardingVersion
+{ _id: 1, clusterId: ObjectId('69bfb4c85a5448521a8c2cfb') }
+---
+shards
+[
+  {
+    _id: 'a',
+    host: 'a/127.0.0.1:26000,127.0.0.1:26001,127.0.0.1:26002',
+    state: 1,
+    topologyTime: Timestamp({ t: 1774171393, i: 7 })
+  },
+  {
+    _id: 'b',
+    host: 'b/127.0.0.1:26100,127.0.0.1:26101,127.0.0.1:26102',
+    state: 1,
+    topologyTime: Timestamp({ t: 1774171393, i: 16 })
+  },
+  {
+    _id: 'c',
+    host: 'c/127.0.0.1:26200,127.0.0.1:26201,127.0.0.1:26202',
+    state: 1,
+    topologyTime: Timestamp({ t: 1774171434, i: 6 })
+  }
+]
+---
+active mongoses
+[ { '6.0.27': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently running': 'no',
+  'Currently enabled': 'yes',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': { '6': 'Success' }
+}
+---
+shardedDataDistribution
+[
+  {
+    ns: 'testdb.testcollection',
+    shards: [
+      {
+        shardName: 'c',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 95874,
+        ownedSizeBytes: 4218456,
+        orphanedSizeBytes: 0
+      },
+      {
+        shardName: 'b',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 129064,
+        ownedSizeBytes: 5678816,
+        orphanedSizeBytes: 0
+      },
+      {
+        shardName: 'a',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 75062,
+        ownedSizeBytes: 3302728,
+        orphanedSizeBytes: 0
+      }
+    ]
+  },
+  {
+    ns: 'config.system.sessions',
+    shards: [
+      {
+        shardName: 'a',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 4,
+        ownedSizeBytes: 396,
+        orphanedSizeBytes: 0
+      }
+    ]
+  }
+]
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {
+      'config.system.sessions': {
+        shardKey: { _id: 1 },
+        unique: false,
+        balancing: true,
+        allowMigrations: true,
+        chunkMetadata: [ { shard: 'a', nChunks: 1024 } ],
+        chunks: [
+          { min: { _id: MinKey() }, max: { _id: { id: UUID('00400000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 1 }) },
+          { min: { _id: { id: UUID('00400000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('00800000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 2 }) },
+          { min: { _id: { id: UUID('00800000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('00c00000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 3 }) },
+          { min: { _id: { id: UUID('00c00000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('01000000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 4 }) },
+          { min: { _id: { id: UUID('01000000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('01400000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 5 }) },
+          { min: { _id: { id: UUID('01400000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('01800000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 6 }) },
+          { min: { _id: { id: UUID('01800000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('01c00000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 7 }) },
+          { min: { _id: { id: UUID('01c00000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('02000000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 8 }) },
+          { min: { _id: { id: UUID('02000000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('02400000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 9 }) },
+          { min: { _id: { id: UUID('02400000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('02800000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 10 }) },
+          { min: { _id: { id: UUID('02800000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('02c00000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 11 }) },
+          { min: { _id: { id: UUID('02c00000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('03000000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 12 }) },
+          { min: { _id: { id: UUID('03000000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('03400000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 13 }) },
+          { min: { _id: { id: UUID('03400000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('03800000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 14 }) },
+          { min: { _id: { id: UUID('03800000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('03c00000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 15 }) },
+          { min: { _id: { id: UUID('03c00000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('04000000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 16 }) },
+          { min: { _id: { id: UUID('04000000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('04400000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 17 }) },
+          { min: { _id: { id: UUID('04400000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('04800000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 18 }) },
+          { min: { _id: { id: UUID('04800000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('04c00000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 19 }) },
+          { min: { _id: { id: UUID('04c00000-0000-0000-0000-000000000000') } }, max: { _id: { id: UUID('05000000-0000-0000-0000-000000000000') } }, 'on shard': 'a', 'last modified': Timestamp({ t: 1, i: 20 }) },
+          'too many chunks to print, use verbose if you want to force print'
+        ],
+        tags: []
+      }
+    }
+  },
+  {
+    database: {
+      _id: 'testdb',
+      primary: 'a',
+      partitioned: false,
+      version: {
+        uuid: UUID('a35db6a3-cf30-489f-acb5-ffffda6669e2'),
+        timestamp: Timestamp({ t: 1774171398, i: 1 }),
+        lastMod: 1
+      }
+    },
+    collections: {
+      'testdb.testcollection': {
+        shardKey: { testkey: 1 },
+        unique: false,
+        balancing: true,
+        allowMigrations: true,
+        chunkMetadata: [
+          { shard: 'a', nChunks: 2 },
+          { shard: 'b', nChunks: 1 },
+          { shard: 'c', nChunks: 4 }
+        ],
+        chunks: [
+          { min: { testkey: MinKey() }, max: { testkey: 'key121443' }, 'on shard': 'c', 'last modified': Timestamp({ t: 4, i: 0 }) },
+          { min: { testkey: 'key121443' }, max: { testkey: 'key142891' }, 'on shard': 'c', 'last modified': Timestamp({ t: 5, i: 0 }) },
+          { min: { testkey: 'key142891' }, max: { testkey: 'key164338' }, 'on shard': 'a', 'last modified': Timestamp({ t: 6, i: 0 }) },
+          { min: { testkey: 'key164338' }, max: { testkey: 'key185786' }, 'on shard': 'c', 'last modified': Timestamp({ t: 7, i: 0 }) },
+          { min: { testkey: 'key185786' }, max: { testkey: 'key31943' }, 'on shard': 'b', 'last modified': Timestamp({ t: 7, i: 1 }) },
+          { min: { testkey: 'key31943' }, max: { testkey: 'key5389' }, 'on shard': 'c', 'last modified': Timestamp({ t: 3, i: 0 }) },
+          { min: { testkey: 'key5389' }, max: { testkey: MaxKey() }, 'on shard': 'a', 'last modified': Timestamp({ t: 3, i: 1 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+]
