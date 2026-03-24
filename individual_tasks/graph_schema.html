@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Network Graph Schema</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 24px;
+        }
+        .schema {
+            position: relative;
+            width: 700px;
+            height: 400px;
+        }
+        .node {
+            position: absolute;
+            width: 200px;
+            border: 3px solid #4a90d9;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e8f4fd 0%, #d0e8f9 100%);
+            overflow: hidden;
+        }
+        .node-header {
+            background: #4a90d9;
+            color: white;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+        .node-body {
+            padding: 15px;
+        }
+        .property {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .property-name {
+            font-weight: 600;
+            color: #2c5282;
+        }
+        .property-type {
+            color: #718096;
+            font-style: italic;
+        }
+        .user-node {
+            left: 50px;
+            top: 120px;
+        }
+        .post-node {
+            right: 50px;
+            top: 120px;
+        }
+        /* SVG for arrows */
+        .arrows {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .relationship-label {
+            position: absolute;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            color: #856404;
+        }
+        .friends-label {
+            left: 85px;
+            top: 30px;
+        }
+        .posted-label {
+            left: 310px;
+            top: 115px;
+        }
+        .likes-label {
+            left: 310px;
+            top: 290px;
+        }
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .legend h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .legend-arrow {
+            width: 60px;
+            height: 20px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Social Network - Property Graph Schema</h1>
+
+        <div class="schema">
+            <!-- User Node -->
+            <div class="node user-node">
+                <div class="node-header">User</div>
+                <div class="node-body">
+                    <div class="property">
+                        <span class="property-name">name:</span>
+                        <span class="property-type">String</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-name">age:</span>
+                        <span class="property-type">Integer</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-name">city:</span>
+                        <span class="property-type">String</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post Node -->
+            <div class="node post-node">
+                <div class="node-header">Post</div>
+                <div class="node-body">
+                    <div class="property">
+                        <span class="property-name">content:</span>
+                        <span class="property-type">String</span>
+                    </div>
+                    <div class="property">
+                        <span class="property-name">timestamp:</span>
+                        <span class="property-type">DateTime</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Relationship Labels -->
+            <div class="relationship-label friends-label">FRIENDS</div>
+            <div class="relationship-label posted-label">POSTED</div>
+            <div class="relationship-label likes-label">LIKES</div>
+
+            <!-- Arrows SVG -->
+            <svg class="arrows" viewBox="0 0 700 400">
+                <!-- FRIENDS: Curved arrow from User back to User (self-loop at top) -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e67e22" />
+                    </marker>
+                    <marker id="arrowhead-both" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#9b59b6" />
+                    </marker>
+                    <marker id="arrowhead-start" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto-start-reverse">
+                        <polygon points="10 0, 0 3.5, 10 7" fill="#9b59b6" />
+                    </marker>
+                </defs>
+
+                <!-- FRIENDS: Bidirectional curved arrow above User node -->
+                <path d="M 100 120 Q 100 50, 150 50 Q 200 50, 200 120"
+                      fill="none" stroke="#9b59b6" stroke-width="3"
+                      marker-end="url(#arrowhead-both)" marker-start="url(#arrowhead-start)"/>
+
+                <!-- POSTED: Arrow from User to Post -->
+                <line x1="255" y1="170" x2="445" y2="170"
+                      stroke="#27ae60" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <defs>
+                    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60" />
+                    </marker>
+                </defs>
+                <line x1="255" y1="170" x2="445" y2="170"
+                      stroke="#27ae60" stroke-width="3" marker-end="url(#arrowhead-green)"/>
+
+                <!-- LIKES: Curved arrow from User to Post (below) -->
+                <path d="M 255 250 Q 350 350, 445 250"
+                      fill="none" stroke="#e74c3c" stroke-width="3"/>
+                <defs>
+                    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                    </marker>
+                </defs>
+                <path d="M 255 250 Q 350 350, 445 250"
+                      fill="none" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowhead-red)"/>
+            </svg>
+        </div>
+
+        <div class="legend">
+            <h3>Relationships</h3>
+            <div class="legend-item">
+                <svg class="legend-arrow" viewBox="0 0 60 20">
+                    <line x1="5" y1="10" x2="40" y2="10" stroke="#9b59b6" stroke-width="3"/>
+                    <polygon points="40 5, 55 10, 40 15" fill="#9b59b6"/>
+                    <polygon points="20 5, 5 10, 20 15" fill="#9b59b6"/>
+                </svg>
+                <span><strong>FRIENDS</strong> - Bidirectional relationship between two Users</span>
+            </div>
+            <div class="legend-item">
+                <svg class="legend-arrow" viewBox="0 0 60 20">
+                    <line x1="5" y1="10" x2="45" y2="10" stroke="#27ae60" stroke-width="3"/>
+                    <polygon points="45 5, 55 10, 45 15" fill="#27ae60"/>
+                </svg>
+                <span><strong>POSTED</strong> - User authored a Post (unidirectional)</span>
+            </div>
+            <div class="legend-item">
+                <svg class="legend-arrow" viewBox="0 0 60 20">
+                    <line x1="5" y1="10" x2="45" y2="10" stroke="#e74c3c" stroke-width="3"/>
+                    <polygon points="45 5, 55 10, 45 15" fill="#e74c3c"/>
+                </svg>
+                <span><strong>LIKES</strong> - User liked a Post (unidirectional)</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
