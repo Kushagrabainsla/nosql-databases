@@ -242,7 +242,7 @@ LIMIT 3
 | Bob   | 1         |
 | Carol | 1         |
 
-*Note: All users have exactly 1 post each in this dataset.*
+*Note: All 5 users who posted (Alice, Bob, Carol, Dave, Eve) have exactly 1 post each. The LIMIT 3 clause returns an arbitrary 3 due to the tie.*
 
 ---
 
