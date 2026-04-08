@@ -1,0 +1,9 @@
+Task 12 Notes
+
+1) Range query note:
+- The shard key is { zip: "hashed" }, so range queries on zipNum cannot be targeted to a single shard.
+- This is why the range query scans all shards.
+
+2) $elemMatch note:
+- tags is an array of key-value objects (e.g., { k: "borough", v: "BROOKLYN" }).
+- $elemMatch is used to match multiple conditions within the same array element.

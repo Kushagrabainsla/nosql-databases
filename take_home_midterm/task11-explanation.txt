@@ -14,7 +14,8 @@ Load process summary:
    unique_key, incident_zip, agency, complaint_type, descriptor, created_date, borough
 2) Added zip = incident_zip for shard key compatibility.
 3) Imported JSON into midterm.records via mongoimport.
-4) Verified distribution with sh.status() and record count.
+4) The dataset was imported twice during retries to increase size for shard distribution (final count 100,000).
+5) Verified distribution with sh.status() and record count.
 
 Commands used (summary):
 - curl ... erm2-nwe9.json ... -o 311_raw.json
