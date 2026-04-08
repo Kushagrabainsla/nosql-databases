@@ -1,0 +1,304 @@
+[direct: mongos] midterm> db.records.find({ zipNum: { $gte: 10000, $lte: 20000 } }).explain("executionStats")
+{
+  queryPlanner: {
+    mongosPlannerVersion: 1,
+    winningPlan: {
+      stage: 'SHARD_MERGE',
+      shards: [
+        {
+          shardName: 'shardC',
+          connectionString: 'shardC/172.31.69.137:27038,172.31.76.188:27038,172.31.77.233:27038',
+          serverInfo: {
+            host: 'ip-172-31-76-188.ec2.internal',
+            port: 27038,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { zipNum: { '$lte': 20000 } },
+              { zipNum: { '$gte': 10000 } }
+            ]
+          },
+          queryHash: '4103EB4C',
+          planCacheKey: '4103EB4C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardA',
+          connectionString: 'shardA/172.31.69.137:27018,172.31.76.188:27018,172.31.77.233:27018',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27018,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { zipNum: { '$lte': 20000 } },
+              { zipNum: { '$gte': 10000 } }
+            ]
+          },
+          queryHash: '4103EB4C',
+          planCacheKey: '4103EB4C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardB',
+          connectionString: 'shardB/172.31.69.137:27028,172.31.76.188:27028,172.31.77.233:27028',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27028,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { zipNum: { '$lte': 20000 } },
+              { zipNum: { '$gte': 10000 } }
+            ]
+          },
+          queryHash: '4103EB4C',
+          planCacheKey: '4103EB4C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        }
+      ]
+    }
+  },
+  executionStats: {
+    nReturned: 99699,
+    executionTimeMillis: 110,
+    totalKeysExamined: 0,
+    totalDocsExamined: 99699,
+    executionStages: {
+      stage: 'SHARD_MERGE',
+      nReturned: 99699,
+      executionTimeMillis: 110,
+      totalKeysExamined: 0,
+      totalDocsExamined: 99699,
+      totalChildMillis: Long('256'),
+      shards: [
+        {
+          shardName: 'shardC',
+          executionSuccess: true,
+          nReturned: 29642,
+          executionTimeMillis: 51,
+          totalKeysExamined: 0,
+          totalDocsExamined: 29642,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 29642,
+            executionTimeMillisEstimate: 8,
+            works: 29643,
+            advanced: 29642,
+            needTime: 0,
+            needYield: 0,
+            saveState: 29,
+            restoreState: 29,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              nReturned: 29642,
+              executionTimeMillisEstimate: 7,
+              works: 29643,
+              advanced: 29642,
+              needTime: 0,
+              needYield: 0,
+              saveState: 29,
+              restoreState: 29,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 29642
+            }
+          }
+        },
+        {
+          shardName: 'shardA',
+          executionSuccess: true,
+          nReturned: 33273,
+          executionTimeMillis: 101,
+          totalKeysExamined: 0,
+          totalDocsExamined: 33273,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 33273,
+            executionTimeMillisEstimate: 21,
+            works: 33274,
+            advanced: 33273,
+            needTime: 0,
+            needYield: 0,
+            saveState: 33,
+            restoreState: 33,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              nReturned: 33273,
+              executionTimeMillisEstimate: 9,
+              works: 33274,
+              advanced: 33273,
+              needTime: 0,
+              needYield: 0,
+              saveState: 33,
+              restoreState: 33,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 33273
+            }
+          }
+        },
+        {
+          shardName: 'shardB',
+          executionSuccess: true,
+          nReturned: 36784,
+          executionTimeMillis: 104,
+          totalKeysExamined: 0,
+          totalDocsExamined: 36784,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 36784,
+            executionTimeMillisEstimate: 21,
+            works: 36785,
+            advanced: 36784,
+            needTime: 0,
+            needYield: 0,
+            saveState: 36,
+            restoreState: 36,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { zipNum: { '$lte': 20000 } },
+                  { zipNum: { '$gte': 10000 } }
+                ]
+              },
+              nReturned: 36784,
+              executionTimeMillisEstimate: 16,
+              works: 36785,
+              advanced: 36784,
+              needTime: 0,
+              needYield: 0,
+              saveState: 36,
+              restoreState: 36,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 36784
+            }
+          }
+        }
+      ]
+    }
+  },
+  serverInfo: {
+    host: 'ip-172-31-69-137.ec2.internal',
+    port: 27017,
+    version: '7.0.31',
+    gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  command: {
+    find: 'records',
+    filter: { zipNum: { '$gte': 10000, '$lte': 20000 } },
+    lsid: { id: UUID('dc086896-ad3b-483a-a397-6dbe15628238') },
+    '$clusterTime': {
+      clusterTime: Timestamp({ t: 1775619118, i: 1 }),
+      signature: {
+        hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+        keyId: 0
+      }
+    },
+    '$db': 'midterm'
+  },
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1775619130, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1775619126, i: 1 })
+}
+[direct: mongos] midterm>

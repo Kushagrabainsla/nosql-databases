@@ -1,0 +1,17 @@
+Task 10 Explanation (Enable Sharding + Shard Key)
+
+Database: midterm
+Collection: records
+Shard key: zip (hashed)
+
+Shard key nature:
+- The key is zip, which becomes effectively random when hashed.
+- Hashed keys spread values uniformly across chunks and shards.
+
+Sharding strategy:
+- Hash-based sharding on { zip: "hashed" }.
+- This improves distribution and balances data across all shards.
+
+Commands used:
+- sh.enableSharding("midterm")
+- sh.shardCollection("midterm.records", { zip: "hashed" })

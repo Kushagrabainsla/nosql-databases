@@ -1,0 +1,129 @@
+[ec2-user@ip-172-31-69-137 ~]$ mongosh --port 27028
+Current Mongosh Log ID: 69d5b4ab4d6dca108044ba88
+Connecting to:          mongodb://127.0.0.1:27028/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.8.2
+Using MongoDB:          7.0.31
+Using Mongosh:          2.8.2
+
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2026-04-08T01:17:51.431+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+------
+
+shardB [direct: primary] test> rs.status()
+{
+  set: 'shardB',
+  date: ISODate('2026-04-08T01:51:46.744Z'),
+  myState: 1,
+  term: Long('1'),
+  syncSourceHost: '',
+  syncSourceId: -1,
+  heartbeatIntervalMillis: Long('2000'),
+  majorityVoteCount: 2,
+  writeMajorityCount: 2,
+  votingMembersCount: 3,
+  writableVotingMembersCount: 3,
+  optimes: {
+    lastCommittedOpTime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+    lastCommittedWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+    readConcernMajorityOpTime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+    appliedOpTime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+    durableOpTime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+    lastAppliedWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+    lastDurableWallTime: ISODate('2026-04-08T01:51:43.256Z')
+  },
+  lastStableRecoveryTimestamp: Timestamp({ t: 1775613053, i: 1 }),
+  electionCandidateMetrics: {
+    lastElectionReason: 'electionTimeout',
+    lastElectionDate: ISODate('2026-04-08T01:30:13.080Z'),
+    electionTerm: Long('1'),
+    lastCommittedOpTimeAtElection: { ts: Timestamp({ t: 1775611801, i: 1 }), t: Long('-1') },
+    lastSeenOpTimeAtElection: { ts: Timestamp({ t: 1775611801, i: 1 }), t: Long('-1') },
+    numVotesNeeded: 2,
+    priorityAtElection: 1,
+    electionTimeoutMillis: Long('10000'),
+    numCatchUpOps: Long('0'),
+    newTermStartDate: ISODate('2026-04-08T01:30:13.126Z'),
+    wMajorityWriteAvailabilityDate: ISODate('2026-04-08T01:30:13.632Z')
+  },
+  members: [
+    {
+      _id: 0,
+      name: '172.31.69.137:27028',
+      health: 1,
+      state: 1,
+      stateStr: 'PRIMARY',
+      uptime: 2036,
+      optime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+      optimeDate: ISODate('2026-04-08T01:51:43.000Z'),
+      lastAppliedWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      lastDurableWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      syncSourceHost: '',
+      syncSourceId: -1,
+      infoMessage: '',
+      electionTime: Timestamp({ t: 1775611813, i: 1 }),
+      electionDate: ISODate('2026-04-08T01:30:13.000Z'),
+      configVersion: 1,
+      configTerm: 1,
+      self: true,
+      lastHeartbeatMessage: ''
+    },
+    {
+      _id: 1,
+      name: '172.31.77.233:27028',
+      health: 1,
+      state: 2,
+      stateStr: 'SECONDARY',
+      uptime: 1304,
+      optime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+      optimeDurable: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+      optimeDate: ISODate('2026-04-08T01:51:43.000Z'),
+      optimeDurableDate: ISODate('2026-04-08T01:51:43.000Z'),
+      lastAppliedWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      lastDurableWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      lastHeartbeat: ISODate('2026-04-08T01:51:45.185Z'),
+      lastHeartbeatRecv: ISODate('2026-04-08T01:51:46.136Z'),
+      pingMs: Long('0'),
+      lastHeartbeatMessage: '',
+      syncSourceHost: '172.31.69.137:27028',
+      syncSourceId: 0,
+      infoMessage: '',
+      configVersion: 1,
+      configTerm: 1
+    },
+    {
+      _id: 2,
+      name: '172.31.76.188:27028',
+      health: 1,
+      state: 2,
+      stateStr: 'SECONDARY',
+      uptime: 1304,
+      optime: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+      optimeDurable: { ts: Timestamp({ t: 1775613103, i: 1 }), t: Long('1') },
+      optimeDate: ISODate('2026-04-08T01:51:43.000Z'),
+      optimeDurableDate: ISODate('2026-04-08T01:51:43.000Z'),
+      lastAppliedWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      lastDurableWallTime: ISODate('2026-04-08T01:51:43.256Z'),
+      lastHeartbeat: ISODate('2026-04-08T01:51:45.185Z'),
+      lastHeartbeatRecv: ISODate('2026-04-08T01:51:46.124Z'),
+      pingMs: Long('0'),
+      lastHeartbeatMessage: '',
+      syncSourceHost: '172.31.69.137:27028',
+      syncSourceId: 0,
+      infoMessage: '',
+      configVersion: 1,
+      configTerm: 1
+    }
+  ],
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1775613103, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1775613103, i: 1 })
+}
+shardB [direct: primary] test>

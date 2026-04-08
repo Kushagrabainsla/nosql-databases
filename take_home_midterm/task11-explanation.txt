@@ -1,0 +1,24 @@
+Task 11 Explanation (Dataset + Load)
+
+Dataset:
+- NYC 311 Service Requests (public)
+- URL: https://data.cityofnewyork.us/resource/erm2-nwe9.json
+
+Collection and fields:
+- Database: midterm
+- Collection: records
+- Added field: zip (copied from incident_zip) to match shard key
+
+Load process summary:
+1) Downloaded a filtered JSON subset (50,000 records) with fields:
+   unique_key, incident_zip, agency, complaint_type, descriptor, created_date, borough
+2) Added zip = incident_zip for shard key compatibility.
+3) Imported JSON into midterm.records via mongoimport.
+4) Verified distribution with sh.status() and record count.
+
+Commands used (summary):
+- curl ... erm2-nwe9.json ... -o 311_raw.json
+- python3: add zip field, write 311_with_zip.json
+- mongoimport --port 27017 --db midterm --collection records --file 311_with_zip.json --jsonArray
+- db.records.countDocuments()
+- sh.status()

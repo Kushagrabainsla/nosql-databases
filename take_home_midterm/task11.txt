@@ -1,0 +1,155 @@
+[ec2-user@ip-172-31-69-137 data]$ mongoimport --port 27017 --db midterm --collection records --file 311_with_zip.json --jsonArray
+2026-04-08T03:24:03.395+0000    connected to: mongodb://localhost:27017/
+2026-04-08T03:24:06.396+0000    [#######################.] midterm.records      10.4MB/10.6MB (98.4%)
+2026-04-08T03:24:06.459+0000    [########################] midterm.records      10.6MB/10.6MB (100.0%)
+2026-04-08T03:24:06.460+0000    50000 document(s) imported successfully. 0 document(s) failed to import.
+[ec2-user@ip-172-31-69-137 data]$ mongosh --port 27017
+Current Mongosh Log ID: 69d5ca598c978012d544ba88
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.8.2
+Using MongoDB:          7.0.31
+Using Mongosh:          2.8.2
+
+For mongosh info see: https://www.mongodb.com/docs/mongodb-shell/
+
+------
+   The server generated these startup warnings when booting
+   2026-04-08T01:09:14.148+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+------
+
+[direct: mongos] test> use midterm
+switched to db midterm
+[direct: mongos] midterm> db.records.countDocuments()
+100000
+[direct: mongos] midterm> sh.status()
+shardingVersion
+{ _id: 1, clusterId: ObjectId('69d5aa35b5ce4cf680f3cbd9') }
+---
+shards
+[
+  {
+    _id: 'shardA',
+    host: 'shardA/172.31.69.137:27018,172.31.76.188:27018,172.31.77.233:27018',
+    state: 1,
+    topologyTime: Timestamp({ t: 1775613417, i: 2 })
+  },
+  {
+    _id: 'shardB',
+    host: 'shardB/172.31.69.137:27028,172.31.76.188:27028,172.31.77.233:27028',
+    state: 1,
+    topologyTime: Timestamp({ t: 1775613417, i: 6 })
+  },
+  {
+    _id: 'shardC',
+    host: 'shardC/172.31.69.137:27038,172.31.76.188:27038,172.31.77.233:27038',
+    state: 1,
+    topologyTime: Timestamp({ t: 1775613417, i: 20 })
+  }
+]
+---
+active mongoses
+[ { '7.0.31': 1 } ]
+---
+autosplit
+{ 'Currently enabled': 'yes' }
+---
+balancer
+{
+  'Currently enabled': 'yes',
+  'Currently running': 'no',
+  'Failed balancer rounds in last 5 attempts': 0,
+  'Migration Results for the last 24 hours': 'No recent migrations'
+}
+---
+shardedDataDistribution
+[
+  {
+    ns: 'config.system.sessions',
+    shards: [
+      {
+        shardName: 'shardA',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 9,
+        ownedSizeBytes: 891,
+        orphanedSizeBytes: 0
+      }
+    ]
+  },
+  {
+    ns: 'midterm.records',
+    shards: [
+      {
+        shardName: 'shardB',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 36881,
+        ownedSizeBytes: 8777678,
+        orphanedSizeBytes: 0
+      },
+      {
+        shardName: 'shardA',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 33361,
+        ownedSizeBytes: 7939918,
+        orphanedSizeBytes: 0
+      },
+      {
+        shardName: 'shardC',
+        numOrphanedDocs: 0,
+        numOwnedDocuments: 29758,
+        ownedSizeBytes: 7082404,
+        orphanedSizeBytes: 0
+      }
+    ]
+  }
+]
+---
+databases
+[
+  {
+    database: { _id: 'config', primary: 'config', partitioned: true },
+    collections: {
+      'config.system.sessions': {
+        shardKey: { _id: 1 },
+        unique: false,
+        balancing: true,
+        allowMigrations: true,
+        chunkMetadata: [ { shard: 'shardA', nChunks: 1 } ],
+        chunks: [
+          { min: { _id: MinKey() }, max: { _id: MaxKey() }, 'on shard': 'shardA', 'last modified': Timestamp({ t: 1, i: 0 }) }
+        ],
+        tags: []
+      }
+    }
+  },
+  {
+    database: {
+      _id: 'midterm',
+      primary: 'shardC',
+      partitioned: false,
+      version: {
+        uuid: UUID('c039b27d-b65b-47ea-bba3-5da787424748'),
+        timestamp: Timestamp({ t: 1775614606, i: 1 }),
+        lastMod: 1
+      }
+    },
+    collections: {
+      'midterm.records': {
+        shardKey: { zip: 'hashed' },
+        unique: false,
+        balancing: true,
+        allowMigrations: true,
+        chunkMetadata: [
+          { shard: 'shardA', nChunks: 1 },
+          { shard: 'shardB', nChunks: 1 },
+          { shard: 'shardC', nChunks: 1 }
+        ],
+        chunks: [
+          { min: { zip: MinKey() }, max: { zip: Long('-3074457345618258602') }, 'on shard': 'shardC', 'last modified': Timestamp({ t: 1, i: 8 }) },
+          { min: { zip: Long('-3074457345618258602') }, max: { zip: Long('3074457345618258602') }, 'on shard': 'shardA', 'last modified': Timestamp({ t: 1, i: 6 }) },
+          { min: { zip: Long('3074457345618258602') }, max: { zip: MaxKey() }, 'on shard': 'shardB', 'last modified': Timestamp({ t: 1, i: 7 }) }
+        ],
+        tags: []
+      }
+    }
+  }
+]
+[direct: mongos] midterm>

@@ -1,0 +1,3 @@
+[direct: mongos] midterm> db.records.deleteMany({ complaint_type: "Noise - Residential" })
+{ acknowledged: true, deletedCount: 14431 }
+[direct: mongos] midterm>

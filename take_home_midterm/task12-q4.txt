@@ -1,0 +1,366 @@
+[direct: mongos] midterm> db.records.aggregate([
+|   { $match: { borough: { $in: ["BROOKLYN", "QUEENS"] } } },
+|   { $group: { _id: "$borough", count: { $sum: 1 } } },
+|   { $sort: { count: -1 } }
+| ]).explain("executionStats")
+{
+  serverInfo: {
+    host: 'ip-172-31-69-137.ec2.internal',
+    port: 27017,
+    version: '7.0.31',
+    gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  mergeType: 'mongos',
+  splitPipeline: {
+    shardsPart: [
+      {
+        '$match': { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } }
+      },
+      {
+        '$group': { _id: '$borough', count: { '$sum': { '$const': 1 } } }
+      }
+    ],
+    mergerPart: [
+      {
+        '$mergeCursors': {
+          lsid: {
+            id: UUID('dc086896-ad3b-483a-a397-6dbe15628238'),
+            uid: Binary.createFromBase64('47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=', 0)
+          },
+          compareWholeSortKey: false,
+          tailableMode: 'normal',
+          nss: 'midterm.records',
+          allowPartialResults: false,
+          recordRemoteOpWaitTime: false
+        }
+      },
+      {
+        '$group': {
+          _id: '$$ROOT._id',
+          count: { '$sum': '$$ROOT.count' },
+          '$doingMerge': true
+        }
+      },
+      { '$sort': { sortKey: { count: -1 } } }
+    ]
+  },
+  shards: {
+    shardC: {
+      host: '172.31.76.188:27038',
+      stages: [
+        {
+          '$cursor': {
+            queryPlanner: {
+              namespace: 'midterm.records',
+              indexFilterSet: false,
+              parsedQuery: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+              queryHash: '869FB6CE',
+              planCacheKey: '869FB6CE',
+              optimizationTimeMillis: 0,
+              maxIndexedOrSolutionsReached: false,
+              maxIndexedAndSolutionsReached: false,
+              maxScansToExplodeReached: false,
+              winningPlan: {
+                stage: 'PROJECTION_SIMPLE',
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    direction: 'forward'
+                  }
+                }
+              },
+              rejectedPlans: []
+            },
+            executionStats: {
+              executionSuccess: true,
+              nReturned: 19417,
+              executionTimeMillis: 56,
+              totalKeysExamined: 0,
+              totalDocsExamined: 29642,
+              executionStages: {
+                stage: 'PROJECTION_SIMPLE',
+                nReturned: 19417,
+                executionTimeMillisEstimate: 8,
+                works: 29643,
+                advanced: 19417,
+                needTime: 10225,
+                needYield: 0,
+                saveState: 30,
+                restoreState: 30,
+                isEOF: 1,
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  nReturned: 19417,
+                  executionTimeMillisEstimate: 8,
+                  works: 29643,
+                  advanced: 19417,
+                  needTime: 10225,
+                  needYield: 0,
+                  saveState: 30,
+                  restoreState: 30,
+                  isEOF: 1,
+                  chunkSkips: 0,
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    nReturned: 19417,
+                    executionTimeMillisEstimate: 7,
+                    works: 29643,
+                    advanced: 19417,
+                    needTime: 10225,
+                    needYield: 0,
+                    saveState: 30,
+                    restoreState: 30,
+                    isEOF: 1,
+                    direction: 'forward',
+                    docsExamined: 29642
+                  }
+                }
+              }
+            }
+          },
+          nReturned: Long('19417'),
+          executionTimeMillisEstimate: Long('41')
+        },
+        {
+          '$group': { _id: '$borough', count: { '$sum': { '$const': 1 } } },
+          maxAccumulatorMemoryUsageBytes: { count: Long('192') },
+          totalOutputDataSizeBytes: Long('666'),
+          usedDisk: false,
+          spills: Long('0'),
+          spilledDataStorageSize: Long('0'),
+          numBytesSpilledEstimate: Long('0'),
+          spilledRecords: Long('0'),
+          nReturned: Long('2'),
+          executionTimeMillisEstimate: Long('41')
+        }
+      ]
+    },
+    shardB: {
+      host: '172.31.77.233:27028',
+      stages: [
+        {
+          '$cursor': {
+            queryPlanner: {
+              namespace: 'midterm.records',
+              indexFilterSet: false,
+              parsedQuery: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+              queryHash: '869FB6CE',
+              planCacheKey: '869FB6CE',
+              optimizationTimeMillis: 0,
+              maxIndexedOrSolutionsReached: false,
+              maxIndexedAndSolutionsReached: false,
+              maxScansToExplodeReached: false,
+              winningPlan: {
+                stage: 'PROJECTION_SIMPLE',
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    direction: 'forward'
+                  }
+                }
+              },
+              rejectedPlans: []
+            },
+            executionStats: {
+              executionSuccess: true,
+              nReturned: 16876,
+              executionTimeMillis: 92,
+              totalKeysExamined: 0,
+              totalDocsExamined: 36784,
+              executionStages: {
+                stage: 'PROJECTION_SIMPLE',
+                nReturned: 16876,
+                executionTimeMillisEstimate: 13,
+                works: 36785,
+                advanced: 16876,
+                needTime: 19908,
+                needYield: 0,
+                saveState: 37,
+                restoreState: 37,
+                isEOF: 1,
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  nReturned: 16876,
+                  executionTimeMillisEstimate: 11,
+                  works: 36785,
+                  advanced: 16876,
+                  needTime: 19908,
+                  needYield: 0,
+                  saveState: 37,
+                  restoreState: 37,
+                  isEOF: 1,
+                  chunkSkips: 0,
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    nReturned: 16876,
+                    executionTimeMillisEstimate: 9,
+                    works: 36785,
+                    advanced: 16876,
+                    needTime: 19908,
+                    needYield: 0,
+                    saveState: 37,
+                    restoreState: 37,
+                    isEOF: 1,
+                    direction: 'forward',
+                    docsExamined: 36784
+                  }
+                }
+              }
+            }
+          },
+          nReturned: Long('16876'),
+          executionTimeMillisEstimate: Long('79')
+        },
+        {
+          '$group': { _id: '$borough', count: { '$sum': { '$const': 1 } } },
+          maxAccumulatorMemoryUsageBytes: { count: Long('192') },
+          totalOutputDataSizeBytes: Long('666'),
+          usedDisk: false,
+          spills: Long('0'),
+          spilledDataStorageSize: Long('0'),
+          numBytesSpilledEstimate: Long('0'),
+          spilledRecords: Long('0'),
+          nReturned: Long('2'),
+          executionTimeMillisEstimate: Long('89')
+        }
+      ]
+    },
+    shardA: {
+      host: '172.31.77.233:27018',
+      stages: [
+        {
+          '$cursor': {
+            queryPlanner: {
+              namespace: 'midterm.records',
+              indexFilterSet: false,
+              parsedQuery: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+              queryHash: '869FB6CE',
+              planCacheKey: '869FB6CE',
+              optimizationTimeMillis: 0,
+              maxIndexedOrSolutionsReached: false,
+              maxIndexedAndSolutionsReached: false,
+              maxScansToExplodeReached: false,
+              winningPlan: {
+                stage: 'PROJECTION_SIMPLE',
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    direction: 'forward'
+                  }
+                }
+              },
+              rejectedPlans: []
+            },
+            executionStats: {
+              executionSuccess: true,
+              nReturned: 18071,
+              executionTimeMillis: 101,
+              totalKeysExamined: 0,
+              totalDocsExamined: 33273,
+              executionStages: {
+                stage: 'PROJECTION_SIMPLE',
+                nReturned: 18071,
+                executionTimeMillisEstimate: 30,
+                works: 33274,
+                advanced: 18071,
+                needTime: 15202,
+                needYield: 0,
+                saveState: 34,
+                restoreState: 34,
+                isEOF: 1,
+                transformBy: { borough: 1, _id: 0 },
+                inputStage: {
+                  stage: 'SHARDING_FILTER',
+                  nReturned: 18071,
+                  executionTimeMillisEstimate: 21,
+                  works: 33274,
+                  advanced: 18071,
+                  needTime: 15202,
+                  needYield: 0,
+                  saveState: 34,
+                  restoreState: 34,
+                  isEOF: 1,
+                  chunkSkips: 0,
+                  inputStage: {
+                    stage: 'COLLSCAN',
+                    filter: { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } },
+                    nReturned: 18071,
+                    executionTimeMillisEstimate: 6,
+                    works: 33274,
+                    advanced: 18071,
+                    needTime: 15202,
+                    needYield: 0,
+                    saveState: 34,
+                    restoreState: 34,
+                    isEOF: 1,
+                    direction: 'forward',
+                    docsExamined: 33273
+                  }
+                }
+              }
+            }
+          },
+          nReturned: Long('18071'),
+          executionTimeMillisEstimate: Long('93')
+        },
+        {
+          '$group': { _id: '$borough', count: { '$sum': { '$const': 1 } } },
+          maxAccumulatorMemoryUsageBytes: { count: Long('192') },
+          totalOutputDataSizeBytes: Long('666'),
+          usedDisk: false,
+          spills: Long('0'),
+          spilledDataStorageSize: Long('0'),
+          numBytesSpilledEstimate: Long('0'),
+          spilledRecords: Long('0'),
+          nReturned: Long('2'),
+          executionTimeMillisEstimate: Long('98')
+        }
+      ]
+    }
+  },
+  command: {
+    aggregate: 'records',
+    pipeline: [
+      {
+        '$match': { borough: { '$in': [ 'BROOKLYN', 'QUEENS' ] } }
+      },
+      { '$group': { _id: '$borough', count: { '$sum': 1 } } },
+      { '$sort': { count: -1 } }
+    ],
+    cursor: {}
+  },
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1775619284, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1775619284, i: 1 })
+}
+[direct: mongos] midterm>

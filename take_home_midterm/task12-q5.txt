@@ -1,0 +1,11 @@
+[direct: mongos] midterm> db.records.updateMany(
+|   { borough: "MANHATTAN", flag2: { $exists: false } },
+|   { $set: { flag2: "manhattan2" } }
+| )
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 19936,
+  modifiedCount: 19936,
+  upsertedCount: 0
+}

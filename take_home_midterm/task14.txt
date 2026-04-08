@@ -1,0 +1,18 @@
+node1 (172.31.69.137):
+  configsvr PRIMARY @27019
+  shardA PRIMARY @27018
+  shardB PRIMARY @27028
+  shardC PRIMARY @27038
+  mongos @27017
+
+node2 (172.31.77.233):
+  configsvr SECONDARY @27019
+  shardA SECONDARY @27018
+  shardB SECONDARY @27028
+  shardC SECONDARY @27038
+
+node3 (172.31.76.188):
+  configsvr SECONDARY @27019
+  shardA SECONDARY @27018
+  shardB SECONDARY @27028
+  shardC SECONDARY @27038
