@@ -1,0 +1,19 @@
+Task 7 (Connect mongos to config servers)
+
+Command to start mongos (on node1 172.31.69.137):
+
+mongos \
+  --configdb csrs/172.31.69.137:27019,172.31.77.233:27019,172.31.76.188:27019 \
+  --port 27017 \
+  --bind_ip 0.0.0.0 \
+  --logpath /home/ec2-user/mongos.log \
+  --fork
+
+Connect and verify:
+
+mongosh --port 27017
+
+sh.status()
+
+Evidence:
+- See screenshot in task7-status.png showing mongos connection and sh.status().

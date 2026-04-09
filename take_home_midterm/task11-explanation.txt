@@ -23,3 +23,24 @@ Commands used (summary):
 - mongoimport --port 27017 --db midterm --collection records --file 311_with_zip.json --jsonArray
 - db.records.countDocuments()
 - sh.status()
+
+Commands used (full):
+1) Download 50,000 records with selected fields
+   curl -L 'https://data.cityofnewyork.us/resource/erm2-nwe9.json?$limit=50000&$select=unique_key,incident_zip,agency,complaint_type,descriptor,created_date,borough' -o 311_raw.json
+2) Add zip field (zip = incident_zip)
+   python3 - <<'PY'
+   import json
+   data = json.load(open("311_raw.json"))
+   for d in data:
+       d["zip"] = d.get("incident_zip")
+   json.dump(data, open("311_with_zip.json", "w"))
+   PY
+
+3) Import into MongoDB
+   mongoimport --port 27017 --db midterm --collection records --file 311_with_zip.json --jsonArray
+
+4) Verify count and shard distribution
+   mongosh --port 27017
+   use midterm
+   db.records.countDocuments()
+   sh.status()
