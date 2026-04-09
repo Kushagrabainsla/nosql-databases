@@ -7,3 +7,7 @@ Task 12 Notes
 2) $elemMatch note:
 - tags is an array of key-value objects (e.g., { k: "borough", v: "BROOKLYN" }).
 - $elemMatch is used to match multiple conditions within the same array element.
+
+3) Consistency note:
+- Task 12 outputs were captured across reruns after recovery and re-import steps.
+- The dataset source, schema, and query logic are unchanged; differences in document counts reflect different load snapshots during reruns.

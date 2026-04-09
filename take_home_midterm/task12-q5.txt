@@ -1,11 +1,317 @@
+[direct: mongos] midterm> db.records.find(
+|   { borough: "MANHATTAN", flag3: { $exists: false } }
+| ).explain("executionStats")
+{
+  queryPlanner: {
+    mongosPlannerVersion: 1,
+    winningPlan: {
+      stage: 'SHARD_MERGE',
+      shards: [
+        {
+          shardName: 'shardA',
+          connectionString: 'shardA/172.31.69.137:27018,172.31.76.188:27018,172.31.77.233:27018',
+          serverInfo: {
+            host: 'ip-172-31-76-188.ec2.internal',
+            port: 27018,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { borough: { '$eq': 'MANHATTAN' } },
+              { flag3: { '$not': { '$exists': true } } }
+            ]
+          },
+          queryHash: 'A913059F',
+          planCacheKey: 'E8DEE53C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardC',
+          connectionString: 'shardC/172.31.69.137:27038,172.31.76.188:27038,172.31.77.233:27038',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27038,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { borough: { '$eq': 'MANHATTAN' } },
+              { flag3: { '$not': { '$exists': true } } }
+            ]
+          },
+          queryHash: 'A913059F',
+          planCacheKey: 'E8DEE53C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardB',
+          connectionString: 'shardB/172.31.69.137:27028,172.31.76.188:27028,172.31.77.233:27028',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27028,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: {
+            '$and': [
+              { borough: { '$eq': 'MANHATTAN' } },
+              { flag3: { '$not': { '$exists': true } } }
+            ]
+          },
+          queryHash: 'A913059F',
+          planCacheKey: 'E8DEE53C',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        }
+      ]
+    }
+  },
+  executionStats: {
+    nReturned: 19068,
+    executionTimeMillis: 49,
+    totalKeysExamined: 0,
+    totalDocsExamined: 93482,
+    executionStages: {
+      stage: 'SHARD_MERGE',
+      nReturned: 19068,
+      executionTimeMillis: 49,
+      totalKeysExamined: 0,
+      totalDocsExamined: 93482,
+      totalChildMillis: Long('107'),
+      shards: [
+        {
+          shardName: 'shardA',
+          executionSuccess: true,
+          nReturned: 4080,
+          executionTimeMillis: 20,
+          totalKeysExamined: 0,
+          totalDocsExamined: 30102,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 4080,
+            executionTimeMillisEstimate: 1,
+            works: 30103,
+            advanced: 4080,
+            needTime: 26022,
+            needYield: 0,
+            saveState: 30,
+            restoreState: 30,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              nReturned: 4080,
+              executionTimeMillisEstimate: 1,
+              works: 30103,
+              advanced: 4080,
+              needTime: 26022,
+              needYield: 0,
+              saveState: 30,
+              restoreState: 30,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 30102
+            }
+          }
+        },
+        {
+          shardName: 'shardC',
+          executionSuccess: true,
+          nReturned: 4262,
+          executionTimeMillis: 39,
+          totalKeysExamined: 0,
+          totalDocsExamined: 28112,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 4262,
+            executionTimeMillisEstimate: 8,
+            works: 28113,
+            advanced: 4262,
+            needTime: 23850,
+            needYield: 0,
+            saveState: 28,
+            restoreState: 28,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              nReturned: 4262,
+              executionTimeMillisEstimate: 7,
+              works: 28113,
+              advanced: 4262,
+              needTime: 23850,
+              needYield: 0,
+              saveState: 28,
+              restoreState: 28,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 28112
+            }
+          }
+        },
+        {
+          shardName: 'shardB',
+          executionSuccess: true,
+          nReturned: 10726,
+          executionTimeMillis: 48,
+          totalKeysExamined: 0,
+          totalDocsExamined: 35268,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 10726,
+            executionTimeMillisEstimate: 9,
+            works: 35269,
+            advanced: 10726,
+            needTime: 24542,
+            needYield: 0,
+            saveState: 35,
+            restoreState: 35,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: {
+                '$and': [
+                  { borough: { '$eq': 'MANHATTAN' } },
+                  { flag3: { '$not': { '$exists': true } } }
+                ]
+              },
+              nReturned: 10726,
+              executionTimeMillisEstimate: 6,
+              works: 35269,
+              advanced: 10726,
+              needTime: 24542,
+              needYield: 0,
+              saveState: 35,
+              restoreState: 35,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 35268
+            }
+          }
+        }
+      ]
+    }
+  },
+  serverInfo: {
+    host: 'ip-172-31-69-137.ec2.internal',
+    port: 27017,
+    version: '7.0.31',
+    gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  command: {
+    find: 'records',
+    filter: { borough: 'MANHATTAN', flag3: { '$exists': false } },
+    lsid: { id: UUID('797ff7a9-5dc5-4687-8148-5e02f80ea5a3') },
+    '$clusterTime': {
+      clusterTime: Timestamp({ t: 1775708419, i: 1 }),
+      signature: {
+        hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+        keyId: 0
+      }
+    },
+    '$db': 'midterm'
+  },
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1775708473, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1775708470, i: 2 })
+}
 [direct: mongos] midterm> db.records.updateMany(
-|   { borough: "MANHATTAN", flag2: { $exists: false } },
-|   { $set: { flag2: "manhattan2" } }
+|   { borough: "MANHATTAN", flag3: { $exists: false } },
+|   { $set: { flag3: "manhattan3" } }
 | )
 {
   acknowledged: true,
   insertedId: null,
-  matchedCount: 19936,
-  modifiedCount: 19936,
+  matchedCount: 19068,
+  modifiedCount: 19068,
   upsertedCount: 0
 }
+[direct: mongos] midterm>

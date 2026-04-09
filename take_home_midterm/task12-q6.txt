@@ -1,3 +1,263 @@
+[direct: mongos] midterm> db.records.find(
+|   { complaint_type: "Noise - Residential" }
+| ).explain("executionStats")
+{
+  queryPlanner: {
+    mongosPlannerVersion: 1,
+    winningPlan: {
+      stage: 'SHARD_MERGE',
+      shards: [
+        {
+          shardName: 'shardA',
+          connectionString: 'shardA/172.31.69.137:27018,172.31.76.188:27018,172.31.77.233:27018',
+          serverInfo: {
+            host: 'ip-172-31-76-188.ec2.internal',
+            port: 27018,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: { complaint_type: { '$eq': 'Noise - Residential' } },
+          queryHash: 'FB21D7F8',
+          planCacheKey: 'FB21D7F8',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardC',
+          connectionString: 'shardC/172.31.69.137:27038,172.31.76.188:27038,172.31.77.233:27038',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27038,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: { complaint_type: { '$eq': 'Noise - Residential' } },
+          queryHash: 'FB21D7F8',
+          planCacheKey: 'FB21D7F8',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        },
+        {
+          shardName: 'shardB',
+          connectionString: 'shardB/172.31.69.137:27028,172.31.76.188:27028,172.31.77.233:27028',
+          serverInfo: {
+            host: 'ip-172-31-77-233.ec2.internal',
+            port: 27028,
+            version: '7.0.31',
+            gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+          },
+          namespace: 'midterm.records',
+          indexFilterSet: false,
+          parsedQuery: { complaint_type: { '$eq': 'Noise - Residential' } },
+          queryHash: 'FB21D7F8',
+          planCacheKey: 'FB21D7F8',
+          optimizationTimeMillis: 0,
+          maxIndexedOrSolutionsReached: false,
+          maxIndexedAndSolutionsReached: false,
+          maxScansToExplodeReached: false,
+          winningPlan: {
+            stage: 'SHARDING_FILTER',
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              direction: 'forward'
+            }
+          },
+          rejectedPlans: []
+        }
+      ]
+    }
+  },
+  executionStats: {
+    nReturned: 3259,
+    executionTimeMillis: 23,
+    totalKeysExamined: 0,
+    totalDocsExamined: 50000,
+    executionStages: {
+      stage: 'SHARD_MERGE',
+      nReturned: 3259,
+      executionTimeMillis: 23,
+      totalKeysExamined: 0,
+      totalDocsExamined: 50000,
+      totalChildMillis: Long('49'),
+      shards: [
+        {
+          shardName: 'shardA',
+          executionSuccess: true,
+          nReturned: 994,
+          executionTimeMillis: 9,
+          totalKeysExamined: 0,
+          totalDocsExamined: 16045,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 994,
+            executionTimeMillisEstimate: 0,
+            works: 16046,
+            advanced: 994,
+            needTime: 15051,
+            needYield: 0,
+            saveState: 16,
+            restoreState: 16,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              nReturned: 994,
+              executionTimeMillisEstimate: 0,
+              works: 16046,
+              advanced: 994,
+              needTime: 15051,
+              needYield: 0,
+              saveState: 16,
+              restoreState: 16,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 16045
+            }
+          }
+        },
+        {
+          shardName: 'shardC',
+          executionSuccess: true,
+          nReturned: 1022,
+          executionTimeMillis: 18,
+          totalKeysExamined: 0,
+          totalDocsExamined: 15078,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 1022,
+            executionTimeMillisEstimate: 1,
+            works: 15079,
+            advanced: 1022,
+            needTime: 14056,
+            needYield: 0,
+            saveState: 15,
+            restoreState: 15,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              nReturned: 1022,
+              executionTimeMillisEstimate: 1,
+              works: 15079,
+              advanced: 1022,
+              needTime: 14056,
+              needYield: 0,
+              saveState: 15,
+              restoreState: 15,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 15078
+            }
+          }
+        },
+        {
+          shardName: 'shardB',
+          executionSuccess: true,
+          nReturned: 1243,
+          executionTimeMillis: 22,
+          totalKeysExamined: 0,
+          totalDocsExamined: 18877,
+          executionStages: {
+            stage: 'SHARDING_FILTER',
+            nReturned: 1243,
+            executionTimeMillisEstimate: 6,
+            works: 18878,
+            advanced: 1243,
+            needTime: 17634,
+            needYield: 0,
+            saveState: 18,
+            restoreState: 18,
+            isEOF: 1,
+            chunkSkips: 0,
+            inputStage: {
+              stage: 'COLLSCAN',
+              filter: { complaint_type: { '$eq': 'Noise - Residential' } },
+              nReturned: 1243,
+              executionTimeMillisEstimate: 6,
+              works: 18878,
+              advanced: 1243,
+              needTime: 17634,
+              needYield: 0,
+              saveState: 18,
+              restoreState: 18,
+              isEOF: 1,
+              direction: 'forward',
+              docsExamined: 18877
+            }
+          }
+        }
+      ]
+    }
+  },
+  serverInfo: {
+    host: 'ip-172-31-69-137.ec2.internal',
+    port: 27017,
+    version: '7.0.31',
+    gitVersion: '6a3bdfa2794c261d3ce011c74f818e970e563609'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'forceClassicEngine'
+  },
+  command: {
+    find: 'records',
+    filter: { complaint_type: 'Noise - Residential' },
+    lsid: { id: UUID('6bbef402-8f47-437a-9b6d-77a5ba954e01') },
+    '$clusterTime': {
+      clusterTime: Timestamp({ t: 1775707623, i: 4702 }),
+      signature: {
+        hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+        keyId: 0
+      }
+    },
+    '$db': 'midterm'
+  },
+  ok: 1,
+  '$clusterTime': {
+    clusterTime: Timestamp({ t: 1775707652, i: 1 }),
+    signature: {
+      hash: Binary.createFromBase64('AAAAAAAAAAAAAAAAAAAAAAAAAAA=', 0),
+      keyId: Long('0')
+    }
+  },
+  operationTime: Timestamp({ t: 1775707650, i: 2 })
+}
 [direct: mongos] midterm> db.records.deleteMany({ complaint_type: "Noise - Residential" })
-{ acknowledged: true, deletedCount: 14431 }
+{ acknowledged: true, deletedCount: 3259 }
 [direct: mongos] midterm>
